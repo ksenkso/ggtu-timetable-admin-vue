@@ -29,7 +29,7 @@ export default class UserInfo extends Vue {
 @import "../../assets/mixins"
 
 .user-info
-  padding: .5em 1em
+  padding: 2em 1em 1em 1em
   display: flex
   align-items: baseline
   &__name

@@ -23,7 +23,9 @@ export default class NavBar extends Vue {
 </script>
 
 <style scoped lang="sass">
+@import "../../assets/functions"
 .sidebar
   grid-area: sidebar
-
+  box-shadow: 2px 0 2px 1px rgba(0, 0, 0, .13)
+  height: 100%
 </style>
