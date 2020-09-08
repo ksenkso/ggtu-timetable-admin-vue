@@ -30,9 +30,9 @@ export default {
 </script>
 
 <style scoped lang="sass">
-@import "../../assets/variables"
+@import "../../assets/functions"
 .button
-  border: 1px solid map-get($colors, "dark")
+  border: 1px solid theme-color("dark")
   padding: 6px 12px
   border-radius: 3px
   background-color: #fff
@@ -41,7 +41,7 @@ export default {
   transition: filter .1s ease-in-out
   &[disabled]
     filter: grayscale(70%)
-    color: map-get($colors, "light")
+    color: theme-color("light")
   &_block
     display: block
     width: 100%
@@ -53,7 +53,7 @@ export default {
         color: map-get($bgToTextMapping, $mod)
         outline-color: scale-color($color, $lightness: 30%)
         @if($mod == "light")
-          border: 1px solid map-get($colors, "gray")
+          border: 1px solid theme-color("gray")
 
 
 </style>

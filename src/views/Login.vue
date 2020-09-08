@@ -47,7 +47,7 @@ export default {
 </script>
 
 <style scoped lang="sass">
-@import "../assets/variables"
+@import "../assets/functions"
 .login-window
   margin: 20px auto
   max-width: 400px

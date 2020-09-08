@@ -53,7 +53,7 @@ export default {
 </script>
 
 <style scoped lang="sass">
-@import "../../assets/variables"
+@import "../../assets/functions"
 .form
   &__field
     margin-bottom: .5em
@@ -69,6 +69,6 @@ export default {
     border: 1px solid #aaa
     border-radius: 3px
     vertical-align: baseline
-    outline-color: scale-color(map-get($colors, "primary"), $lightness: 30%)
+    outline-color: scale-color(theme-color("primary"), $lightness: 30%)
 
 </style>
