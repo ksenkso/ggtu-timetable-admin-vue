@@ -12,8 +12,8 @@
 <script>
 
 import {api} from '../api';
-import Field from '@/components/Field.vue';
-import Form from '@/components/Form.vue';
+import Field from '@/components/forms/Field.vue';
+import Form from '@/components/forms/Form.vue';
 
 export default {
   name: 'Login',

@@ -30,7 +30,7 @@ export default {
 </script>
 
 <style scoped lang="sass">
-@import "../assets/variables"
+@import "../../assets/variables"
 .button
   border: 1px solid map-get($colors, "dark")
   padding: 6px 12px

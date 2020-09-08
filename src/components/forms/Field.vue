@@ -53,7 +53,7 @@ export default {
 </script>
 
 <style scoped lang="sass">
-@import "../assets/variables"
+@import "../../assets/variables"
 .form
   &__field
     margin-bottom: .5em
