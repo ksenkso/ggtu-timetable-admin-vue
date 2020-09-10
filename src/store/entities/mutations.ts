@@ -13,8 +13,9 @@ const createMutations = (): MutationTree<EntitiesState> => {
         [SET_ENTITY](state, entity: WithId<NamedEntity>) {
             Vue.set(state.entities, entity.id, entity)
         },
-        [REMOVE_ENTITY](state, id: number) {
-            Vue.delete(state.entities, id);
+        [REMOVE_ENTITY](state, entityId: number) {
+            state.ids = state.ids.filter(id => id !== entityId);
+            Vue.delete(state.entities, entityId);
         },
         [SET_ALL_ENTITIES](state, entities: WithId<NamedEntity>[]) {
             state.entities = entities.reduce<NamedEntityDict>((acc, entity) => {
