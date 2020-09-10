@@ -33,9 +33,12 @@ export default {
   grid-template-areas: "header header" "sidebar content"
   grid-column-gap: 4px
   height: 100%
+  max-height: 100%
+
   &__content
     grid-area: content
     padding: 1em 1.5em
+    overflow: auto
 
   &__title
     margin: 0

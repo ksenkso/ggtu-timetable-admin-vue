@@ -8,6 +8,8 @@
 @import "node_modules/normalize-scss/sass/normalize/import-now"
 #app
   height: 100%
+
+  max-height: 100%
 html, body
   font-family: Tahoma, Arial, sans-serif
   font-size: 16px
