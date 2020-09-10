@@ -1,9 +1,9 @@
 <template>
   <Page title="Преподаватели">
-    <div class="entity-controls">
-      <EntityFilter :filter-callback="filterCallback"></EntityFilter>
-      <router-link to="/teachers/create" class="button button_theme-primary">Добавить</router-link>
-    </div>
+    <EntityControls
+        create-route="/teachers/create"
+        :filter-callback="filterCallback">
+    </EntityControls>
     <EntityList
         :entities="teachers"
         editRoute="/teachers"
@@ -20,14 +20,13 @@ import {DELETE_ENTITY, GET_ALL_ENTITIES} from "@/store/entities/action-types";
 import {namespace} from "vuex-class";
 import Page from "@/views/Page.vue";
 import {SET_FILTER} from "@/store/entities/mutations-types";
-import EntityFilter from "@/components/entities/EntityFilter.vue";
-import Button from "@/components/common/Button.vue";
+import EntityControls from "@/components/common/EntityControls.vue";
 
 const teachers = namespace('teachers');
 
 @Component({
   name: 'Teachers',
-  components: {Page, Button, EntityList, EntityFilter}
+  components: {Page, EntityList, EntityControls}
 })
 export default class Teachers extends Vue {
   @teachers.Getter('filteredEntities') teachers!: NamedEntityDict;
