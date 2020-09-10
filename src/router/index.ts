@@ -1,6 +1,5 @@
 import Vue from 'vue'
 import VueRouter, {RouteConfig} from 'vue-router'
-import Home from '../views/Home.vue'
 import {api} from "@/api";
 
 Vue.use(VueRouter)
@@ -31,6 +30,14 @@ const routes: Array<RouteConfig> = [
         path: '/groups',
         name: 'Groups',
         component: () => import(/* webpackChunkName: "groups" */'../views/Groups.vue'),
+        meta: {
+            private: true
+        }
+    },
+    {
+        path: '/teachers',
+        name: 'Teachers',
+        component: () => import(/* webpackChunkName: "teachers" */'../views/Teachers.vue'),
         meta: {
             private: true
         }

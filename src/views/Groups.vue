@@ -1,9 +1,8 @@
 <template>
   <Page title="Группы">
-    <EntityFilter type="groups"></EntityFilter>
+    <EntityFilter :filter-callback="filterCallback"></EntityFilter>
     <EntityList
         :entities="groups"
-        :ids="ids"
         editRoute="/groups"
         :deleteCallback="deleteCallback"
     ></EntityList>
@@ -18,6 +17,7 @@ import {DELETE_ENTITY, GET_ALL_ENTITIES} from '@/store/entities/action-types';
 import {NamedEntityDict} from "@/store/entities/types";
 import EntityList from "@/components/entities/EntityList.vue";
 import EntityFilter from "@/components/entities/EntityFilter.vue";
+import {SET_FILTER} from "@/store/entities/mutations-types";
 const groups = namespace('groups');
 
 @Component({
@@ -26,11 +26,10 @@ const groups = namespace('groups');
 })
 export default class Groups extends Vue {
 
-  @groups.State('ids') ids!: number[];
-  @groups.State('entities') groups!: NamedEntityDict;
+  @groups.Getter('filteredEntities') groups!: NamedEntityDict;
   @groups.Action(GET_ALL_ENTITIES) getAll!: () => Promise<void>;
   @groups.Action(DELETE_ENTITY) deleteCallback!: () => Promise<void>;
-
+  @groups.Mutation(SET_FILTER) filterCallback!: (filter: string) => void;
   mounted() {
     this.getAll();
   }
