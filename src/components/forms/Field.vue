@@ -4,7 +4,15 @@
       <label :for="id" class="form__label">{{ label }}</label>
     </slot>
     <slot name="input" :updateValue="updateValue" :disabled="disabled" :readonly="readonly">
-      <input @input="$emit('input', $event)" :type="type" :name="name" :id="id" class="form__control" v-model="value" :disabled="disabled" :readonly="readonly">
+      <input
+          class="form__control"
+          @input="$emit('input', $event)"
+          :type="type"
+          :name="name"
+          :id="id"
+          v-model="value"
+          :disabled="disabled"
+          :readonly="readonly">
     </slot>
   </div>
 </template>
@@ -35,12 +43,17 @@ export default {
     },
     inline: {
       type: Boolean,
-      required: false
-    }
+      required: false,
+    },
+    initialValue: {
+      type: String,
+      required: false,
+      default: null,
+    },
   },
   data() {
     return {
-      value: null,
+      value: this.initialValue,
     }
   },
   computed: {
@@ -49,13 +62,13 @@ export default {
     },
     className() {
       return `form__field${this.inline ? ' form__field_inline' : ''}`
-    }
+    },
   },
   methods: {
     updateValue(newValue) {
       this.value = newValue;
-    }
-  }
+    },
+  },
 }
 </script>
 
@@ -65,15 +78,19 @@ export default {
   &__field
     margin-bottom: .5em
     width: 100%
+
     &_inline
       display: flex
+
       .form__label
         margin-left: 0
         margin-right: 8px
+
   &__label
     display: block
     margin-bottom: .1em
     margin-left: 8px
+
   &__control
     width: 100%
     padding: 6px 8px 2px 8px
