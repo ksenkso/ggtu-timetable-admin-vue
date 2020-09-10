@@ -5,6 +5,7 @@
         :filter-callback="filterCallback">
     </EntityControls>
     <EntityList
+        v-show="!isEmpty"
         :entities="teachers"
         editRoute="/teachers"
         :deleteCallback="deleteCallback"
@@ -29,6 +30,7 @@ const teachers = namespace('teachers');
   components: {Page, EntityList, EntityControls}
 })
 export default class Teachers extends Vue {
+  @teachers.Getter('isEmpty') isEmpty!: boolean;
   @teachers.Getter('filteredEntities') teachers!: NamedEntityDict;
   @teachers.Action(GET_ALL_ENTITIES) getAll!: () => Promise<void>;
   @teachers.Action(DELETE_ENTITY) deleteCallback!: (id: number) => Promise<void>;

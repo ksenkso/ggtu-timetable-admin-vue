@@ -1,6 +1,15 @@
 <template>
   <Page title="Предметы">
-
+    <EntityControls
+        create-route="/teachers/create"
+        :filter-callback="filterCallback">
+    </EntityControls>
+    <EntityList
+        v-show="!isEmpty"
+        :entities="lessons"
+        editRoute="/lessons"
+        :deleteCallback="deleteCallback"
+    ></EntityList>
   </Page>
 </template>
 
@@ -21,6 +30,7 @@ const lessons = namespace('lessons');
   components: {Page, EntityControls, EntityList}
 })
 export default class Lessons extends Vue {
+  @lessons.Getter('isEmpty') isEmpty!: boolean;
   @lessons.Getter('filteredEntities') lessons!: NamedEntityDict;
   @lessons.Action(GET_ALL_ENTITIES) getAll!: () => Promise<void>;
   @lessons.Action(DELETE_ENTITY) deleteCallback!: (id: number) => Promise<void>;

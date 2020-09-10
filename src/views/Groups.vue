@@ -6,6 +6,7 @@
     >
     </EntityControls>
     <EntityList
+        v-show="!isEmpty"
         :entities="groups"
         editRoute="/groups"
         :deleteCallback="deleteCallback"
@@ -31,6 +32,7 @@ const groups = namespace('groups');
 })
 export default class Groups extends Vue {
 
+  @groups.Getter('isEmpty') isEmpty!: boolean;
   @groups.Getter('filteredEntities') groups!: NamedEntityDict;
   @groups.Action(GET_ALL_ENTITIES) getAll!: () => Promise<void>;
   @groups.Action(DELETE_ENTITY) deleteCallback!: () => Promise<void>;
