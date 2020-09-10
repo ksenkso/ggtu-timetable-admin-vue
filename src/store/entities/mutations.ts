@@ -1,7 +1,7 @@
 import {EntitiesState, NamedEntity, NamedEntityDict} from "@/store/entities/types";
 import {MutationTree} from "vuex";
 import {WithId} from 'ggtu-timetable-api-client/dist/interfaces';
-import {ADD_ENTITY, REMOVE_ENTITY, SET_ALL_ENTITIES, SET_ENTITY} from "@/store/entities/mutations-types";
+import {ADD_ENTITY, REMOVE_ENTITY, SET_ALL_ENTITIES, SET_ENTITY, SET_FILTER} from "@/store/entities/mutations-types";
 import Vue from "vue";
 
 const createMutations = (): MutationTree<EntitiesState> => {
@@ -22,6 +22,9 @@ const createMutations = (): MutationTree<EntitiesState> => {
                 return acc;
             }, {});
             state.ids = entities.map(entity => entity.id);
+        },
+        [SET_FILTER](state, filter) {
+            state.filter = filter;
         }
     }
 }

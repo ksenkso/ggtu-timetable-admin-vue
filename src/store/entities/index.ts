@@ -9,10 +9,20 @@ const createEntitiesModule = (type: EntityType): Module<EntitiesState, RootState
     namespaced: true,
     state: () => ({
         entities: {},
-        ids: []
+        ids: [],
+        filter: '',
     }),
     mutations: createMutations(),
     actions: createActions(type),
+    getters: {
+        filteredEntities(state) {
+            return state.filter
+                ? state.ids
+                    .filter(id => state.entities[id].name.toLowerCase().includes(state.filter))
+                    .map(id => state.entities[id])
+                : state.entities;
+        }
+    }
 });
 
 export default createEntitiesModule;
