@@ -29,7 +29,7 @@ export default {
 }
 </script>
 
-<style scoped lang="sass">
+<style lang="sass">
 @import "../../assets/functions"
 .button
   border: 1px solid theme-color("dark")
@@ -39,6 +39,7 @@ export default {
   vertical-align: middle
   cursor: pointer
   transition: filter .1s ease-in-out
+  text-decoration: none
   &[disabled]
     filter: grayscale(70%)
     color: theme-color("light")
