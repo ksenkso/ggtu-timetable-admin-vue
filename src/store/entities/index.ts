@@ -25,8 +25,8 @@ const createEntitiesModule = (type: EntityType): Module<EntitiesState, RootState
                     }, {})
                 : state.entities;
         },
-        isEmpty(state): boolean {
-            return state.ids.length === 0;
+        isEmpty(state, getters): boolean {
+            return !Object.keys(getters.filteredEntities).length;
         }
     }
 });

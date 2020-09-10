@@ -35,13 +35,45 @@ const routes: Array<RouteConfig> = [
         }
     },
     {
+        path: '/groups/:id',
+        name: 'GroupView',
+        component: () => import(/* webpackChunkName: "groupView" */'../views/GroupView.vue'),
+        meta: {
+            private: true
+        }
+    },
+    {
         path: '/teachers',
         name: 'Teachers',
         component: () => import(/* webpackChunkName: "teachers" */'../views/Teachers.vue'),
         meta: {
             private: true
         }
-    }
+    },
+    {
+        path: '/teachers/create',
+        name: 'TeacherCreate',
+        component: () => import(/* webpackChunkName: "teacherView" */'../views/TeacherView.vue'),
+        meta: {
+            private: true
+        }
+    },
+    {
+        path: '/teachers/:id',
+        name: 'TeacherView',
+        component: () => import(/* webpackChunkName: "teacherView" */'../views/TeacherView.vue'),
+        meta: {
+            private: true
+        }
+    },
+    {
+        path: '/lessons',
+        name: 'Lessons',
+        component: () => import(/* webpackChunkName: "lessons" */'../views/Lessons.vue'),
+        meta: {
+            private: true
+        }
+    },
 ]
 
 const router = new VueRouter({
