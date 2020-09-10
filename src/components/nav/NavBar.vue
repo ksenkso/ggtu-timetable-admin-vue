@@ -18,6 +18,7 @@ export default class NavBar extends Vue {
   menuItems: MenuItem[] = [
     {link: '/groups', text: 'Группы'},
     {link: '/teachers', text: 'Учителя'},
+    {link: '/lessons', text: 'Предметы'},
   ];
 }
 </script>
