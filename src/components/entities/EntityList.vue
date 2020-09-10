@@ -2,7 +2,7 @@
   <ul class="entity-list">
     <li v-for="entity in entities" :key="entity.id" class="entity-list__item">
       <router-link class="entity-list__link" :to="`${editRoute}/${entity.id}`">{{ entity.name }}</router-link>
-      <Button class="entity-list__delete" theme="danger" @click="deleteEntity(entity)">Удалить</Button>
+      <Button class="entity-list__delete" theme="danger" @click.native="deleteEntity(entity)">Удалить</Button>
     </li>
   </ul>
 </template>
@@ -11,6 +11,7 @@
 import {Component, Prop, Vue} from 'vue-property-decorator';
 import Button from '@/components/common/Button.vue';
 import {NamedEntity, NamedEntityDict} from '@/store/entities/types.js';
+import {WithId} from "ggtu-timetable-api-client";
 
 @Component({
   name: 'EntityList',
@@ -22,15 +23,15 @@ export default class EntityList extends Vue {
   entities!: NamedEntityDict;
 
   @Prop({required: true})
-  deleteCallback!: Function;
+  deleteCallback!: (id: number) => Promise<void>;
 
   @Prop({required: true})
   editRoute!: string;
 
-  deleteEntity(entity: NamedEntity) {
+  deleteEntity(entity: WithId<NamedEntity>) {
     const shouldDelete = confirm(`Удалить ${entity.name}?`);
     if (shouldDelete) {
-      this.deleteCallback();
+      this.deleteCallback(entity.id);
     }
   }
 }
