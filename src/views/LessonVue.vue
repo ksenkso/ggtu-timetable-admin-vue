@@ -24,6 +24,7 @@ const lessons = namespace('lessons');
   components: {Page, Form, Field}
 })
 export default class GroupView extends EntityView<Lesson> {
+  redirectRoute = '/lessons';
   isLoading = false;
   @lessons.Action(UPDATE_ENTITY) update!: (lesson: WithId<Group>) => Promise<void>;
   @lessons.Action(CREATE_ENTITY) create!: (lesson: Group) => Promise<void>;

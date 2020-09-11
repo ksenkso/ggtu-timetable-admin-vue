@@ -25,7 +25,7 @@ const teachers = namespace('teachers');
   components: {Page, Form, Field, Button}
 })
 export default class TeacherView extends EntityView<Teacher> {
-
+  redirectRoute = '/teachers';
   @teachers.Action(UPDATE_ENTITY) update!: (teacher: WithId<Teacher>) => Promise<void>;
   @teachers.Action(CREATE_ENTITY) create!: (teacher: Teacher) => Promise<void>;
 

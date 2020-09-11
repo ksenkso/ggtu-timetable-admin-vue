@@ -2,7 +2,7 @@ import {Component, Vue} from "vue-property-decorator";
 import Form from "@/components/forms/Form.vue";
 import Field from "@/components/forms/Field.vue";
 import Page from "@/views/Page.vue";
-import {NavigationGuardNext, Route} from "vue-router";
+import {NavigationGuardNext, RawLocation, Route} from "vue-router";
 
 Component.registerHooks([
     'beforeRouteEnter',
@@ -13,6 +13,7 @@ Component.registerHooks([
     components: {Page, Form, Field}
 })
 export default class EntityView<T extends {name: string; id?: number}> extends Vue {
+    redirectRoute: RawLocation = '/';
     model: T | null = null;
 
     get title(): string {
@@ -32,7 +33,7 @@ export default class EntityView<T extends {name: string; id?: number}> extends V
         }
 
         request.then(() => {
-            this.$router.push('/teachers');
+            this.$router.push(this.redirectRoute);
         })
     }
 
