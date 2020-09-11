@@ -35,6 +35,14 @@ const routes: Array<RouteConfig> = [
         }
     },
     {
+        path: '/groups/create',
+        name: 'GroupCreate',
+        component: () => import(/* webpackChunkName: "groupView" */'../views/GroupView.vue'),
+        meta: {
+            private: true
+        }
+    },
+    {
         path: '/groups/:id',
         name: 'GroupView',
         component: () => import(/* webpackChunkName: "groupView" */'../views/GroupView.vue'),
