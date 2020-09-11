@@ -1,6 +1,6 @@
 <template>
   <Page :title="title">
-    <Form :is-loading="isLoading" v-if="model" send-button-text="Сохранить" @submit="onSubmit">
+    <Form v-if="model" send-button-text="Сохранить" @submit="onSubmit">
       <Field label="ФИО" name="name" :initial-value="model.name"></Field>
     </Form>
   </Page>
@@ -31,7 +31,6 @@ const teachers = namespace('teachers');
 })
 export default class TeacherView extends Vue {
   model: Teacher | null = null;
-  isLoading = false;
 
   @teachers.Action(UPDATE_ENTITY) update!: (teacher: WithId<Teacher>) => Promise<void>;
   @teachers.Action(CREATE_ENTITY) create!: (teacher: Teacher) => Promise<void>;
@@ -57,11 +56,9 @@ export default class TeacherView extends Vue {
     next((vm: Vue) => {
       if (to.params.id) {
         console.log(to.params.id);
-        (vm as TeacherView).isLoading = true;
         api.teachers.get(+to.params.id)
             .then((teacher) => {
               (vm as TeacherView).model = teacher;
-              (vm as TeacherView).isLoading = false;
               next();
             });
       } else {

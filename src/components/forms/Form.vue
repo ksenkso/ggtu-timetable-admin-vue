@@ -4,7 +4,9 @@
       <slot></slot>
     </div>
     <div class="form__buttons">
-      <Button class="button_block" type="submit" theme="primary" :disabled="isLoading">{{ sendButtonText }}</Button>
+      <slot name="submit" :disabled="isLoading">
+        <Button type="submit" theme="primary" :disabled="isLoading">{{ sendButtonText }}</Button>
+      </slot>
     </div>
   </form>
 </template>
@@ -42,8 +44,6 @@ export default {
 
 <style scoped lang="sass">
 .form
-  display: flex
-  flex-direction: column
   &__buttons
     margin-top: 1em
 
