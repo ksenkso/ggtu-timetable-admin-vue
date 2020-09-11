@@ -7,21 +7,16 @@
 </template>
 
 <script lang="ts">
-import {Component, Vue} from "vue-property-decorator";
+import {Component} from "vue-property-decorator";
 import Page from "./Page.vue";
-import {NavigationGuardNext, Route} from "vue-router";
 import {Teacher, WithId} from "ggtu-timetable-api-client";
-import {api} from "@/api";
 import Form from "@/components/forms/Form.vue";
 import Field from "@/components/forms/Field.vue";
 import Button from "@/components/common/Button.vue";
 import {namespace} from "vuex-class";
 import {CREATE_ENTITY, UPDATE_ENTITY} from "@/store/entities/action-types";
-
-Component.registerHooks([
-    'beforeRouteEnter',
-    'beforeRouteUpdate'
-])
+import EntityView from "@/mixins/EntityView";
+import {api} from "@/api";
 
 const teachers = namespace('teachers');
 
@@ -29,8 +24,7 @@ const teachers = namespace('teachers');
   name: 'TeacherView',
   components: {Page, Form, Field, Button}
 })
-export default class TeacherView extends Vue {
-  model: Teacher | null = null;
+export default class TeacherView extends EntityView<Teacher> {
 
   @teachers.Action(UPDATE_ENTITY) update!: (teacher: WithId<Teacher>) => Promise<void>;
   @teachers.Action(CREATE_ENTITY) create!: (teacher: Teacher) => Promise<void>;
@@ -39,33 +33,10 @@ export default class TeacherView extends Vue {
     return this.$route.params.id ? 'Редактирование преподавателя' : 'Добавление преподавателя';
   }
 
-  onSubmit({name}: {name: string}) {
-    let request;
-    if (this.model?.id) {
-      request = this.update({name, id: this.model.id});
-    } else {
-      request = this.create({name});
-    }
-
-    request.then(() => {
-      this.$router.push('/teachers');
-    })
+  getEntity = (id: number): Promise<Teacher> => {
+    return api.teachers.get(id);
   }
 
-  beforeRouteEnter(to: Route, from: Route, next: NavigationGuardNext) {
-    next((vm: Vue) => {
-      if (to.params.id) {
-        console.log(to.params.id);
-        api.teachers.get(+to.params.id)
-            .then((teacher) => {
-              (vm as TeacherView).model = teacher;
-              next();
-            });
-      } else {
-        (vm as TeacherView).model = {name: ''};
-      }
-    })
-  }
 }
 </script>
 
