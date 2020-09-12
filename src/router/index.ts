@@ -4,6 +4,8 @@ import {api} from "@/api";
 import lessons from "./lessons";
 import teachers from "@/router/teachers";
 import groups from "@/router/groups";
+import cabinets from "@/router/cabinets";
+import buildings from "@/router/buildings";
 
 Vue.use(VueRouter)
 
@@ -20,7 +22,9 @@ const routes: Array<RouteConfig> = [
     },
     ...groups,
     ...teachers,
-    ...lessons
+    ...lessons,
+    ...cabinets,
+    ...buildings,
 ]
 
 const router = new VueRouter({
