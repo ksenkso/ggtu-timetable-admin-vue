@@ -1,6 +1,7 @@
 import {WithId} from "ggtu-timetable-api-client";
 
 export interface NamedEntity {
+    id?: number;
     name: string;
 }
 
