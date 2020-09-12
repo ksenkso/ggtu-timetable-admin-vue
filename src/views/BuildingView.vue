@@ -12,7 +12,6 @@ import Page from "./Page.vue";
 import {Building, WithId} from "ggtu-timetable-api-client";
 import Form from "@/components/forms/Form.vue";
 import Field from "@/components/forms/Field.vue";
-import Button from "@/components/common/Button.vue";
 import {namespace} from "vuex-class";
 import entityView from "@/mixins/EntityView";
 import {api} from "@/api";
@@ -21,7 +20,7 @@ const buildings = namespace('buildings');
 
 @Component({
   name: 'BuildingView',
-  components: {Page, Form, Field, Button}
+  components: {Page, Form, Field}
 })
 export default class BuildingView extends entityView(buildings) {
   redirectRoute = '/buildings';
