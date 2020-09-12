@@ -1,12 +1,12 @@
 <template>
   <Page title="Предметы">
     <EntityControls
-        create-route="/teachers/create"
+        create-route="/lessons/create"
         :filter-callback="filterCallback">
     </EntityControls>
     <EntityList
         v-show="!isEmpty"
-        :entities="lessons"
+        :entities="filteredEntities"
         editRoute="/lessons"
         :deleteCallback="deleteCallback"
     ></EntityList>
@@ -14,14 +14,12 @@
 </template>
 
 <script lang="ts">
-import {Component, Vue} from "vue-property-decorator";
+import {Component} from "vue-property-decorator";
 import Page from "./Page.vue";
 import EntityControls from "../components/common/EntityControls.vue";
 import EntityList from "../components/entities/EntityList.vue";
 import {namespace} from "vuex-class";
-import {NamedEntityDict} from "@/store/entities/types";
-import {DELETE_ENTITY, GET_ALL_ENTITIES} from "@/store/entities/action-types";
-import {SET_FILTER} from "@/store/entities/mutations-types";
+import entityListPage from "@/mixins/EntityListPage";
 
 const lessons = namespace('lessons');
 
@@ -29,12 +27,8 @@ const lessons = namespace('lessons');
   name: 'Lessons',
   components: {Page, EntityControls, EntityList}
 })
-export default class Lessons extends Vue {
-  @lessons.Getter('isEmpty') isEmpty!: boolean;
-  @lessons.Getter('filteredEntities') lessons!: NamedEntityDict;
-  @lessons.Action(GET_ALL_ENTITIES) getAll!: () => Promise<void>;
-  @lessons.Action(DELETE_ENTITY) deleteCallback!: (id: number) => Promise<void>;
-  @lessons.Mutation(SET_FILTER) filterCallback!: (filter: string) => void;
+export default class Lessons extends entityListPage(lessons) {
+
 }
 </script>
 

@@ -1,13 +1,12 @@
 <template>
   <Page title="Группы">
     <EntityControls
-      create-route="/groups/create"
-      :filter-callback="filterCallback"
-    >
+        create-route="/groups/create"
+        :filter-callback="filterCallback">
     </EntityControls>
     <EntityList
         v-show="!isEmpty"
-        :entities="groups"
+        :entities="filteredEntities"
         editRoute="/groups"
         :deleteCallback="deleteCallback"
     ></EntityList>
@@ -16,13 +15,11 @@
 
 <script lang="ts">
 import Page from '@/views/Page.vue';
-import {Component, Vue} from "vue-property-decorator";
+import {Component} from "vue-property-decorator";
 import {namespace} from 'vuex-class';
-import {DELETE_ENTITY, GET_ALL_ENTITIES} from '@/store/entities/action-types';
-import {NamedEntityDict} from "@/store/entities/types";
 import EntityList from "@/components/entities/EntityList.vue";
-import {SET_FILTER} from "@/store/entities/mutations-types";
 import EntityControls from "@/components/common/EntityControls.vue";
+import entityListPage from "@/mixins/EntityListPage";
 
 const groups = namespace('groups');
 
@@ -30,18 +27,7 @@ const groups = namespace('groups');
   name: 'Groups',
   components: {Page, EntityList, EntityControls}
 })
-export default class Groups extends Vue {
-
-  @groups.Getter('isEmpty') isEmpty!: boolean;
-  @groups.Getter('filteredEntities') groups!: NamedEntityDict;
-  @groups.Action(GET_ALL_ENTITIES) getAll!: () => Promise<void>;
-  @groups.Action(DELETE_ENTITY) deleteCallback!: () => Promise<void>;
-  @groups.Mutation(SET_FILTER) filterCallback!: (filter: string) => void;
-
-  mounted() {
-    this.getAll();
-  }
-
+export default class Groups extends entityListPage(groups) {
 
 }
 </script>
