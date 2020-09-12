@@ -14,8 +14,7 @@ import Form from "@/components/forms/Form.vue";
 import Field from "@/components/forms/Field.vue";
 import Button from "@/components/common/Button.vue";
 import {namespace} from "vuex-class";
-import {CREATE_ENTITY, UPDATE_ENTITY} from "@/store/entities/action-types";
-import EntityView from "@/mixins/EntityView";
+import entityView from "@/mixins/EntityView";
 import {api} from "@/api";
 
 const teachers = namespace('teachers');
@@ -24,16 +23,14 @@ const teachers = namespace('teachers');
   name: 'TeacherView',
   components: {Page, Form, Field, Button}
 })
-export default class TeacherView extends EntityView<Teacher> {
+export default class TeacherView extends entityView(teachers) {
   redirectRoute = '/teachers';
-  @teachers.Action(UPDATE_ENTITY) update!: (teacher: WithId<Teacher>) => Promise<void>;
-  @teachers.Action(CREATE_ENTITY) create!: (teacher: Teacher) => Promise<void>;
 
   get title(): string {
     return this.$route.params.id ? 'Редактирование преподавателя' : 'Добавление преподавателя';
   }
 
-  getEntity = (id: number): Promise<Teacher> => {
+  getEntity = (id: number): Promise<WithId<Teacher>> => {
     return api.teachers.get(id);
   }
 
