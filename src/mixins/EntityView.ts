@@ -1,7 +1,4 @@
 import {Component, Vue} from "vue-property-decorator";
-import Form from "@/components/forms/Form.vue";
-import Field from "@/components/forms/Field.vue";
-import Page from "@/views/Page.vue";
 import {NavigationGuardNext, RawLocation, Route} from "vue-router";
 import {BindingHelpers} from "vuex-class/lib/bindings";
 import {CREATE_ENTITY, UPDATE_ENTITY} from "@/store/entities/action-types";
@@ -16,8 +13,7 @@ export default function entityView(context: BindingHelpers) {
 
     @Component({
         name: 'EntityView',
-        components: {Page, Form, Field}
-    })
+   })
     class EntityView extends Vue {
 
         get title(): string {
