@@ -9,13 +9,12 @@
 <script lang="ts">
 import {Component} from "vue-property-decorator";
 import Page from "./Page.vue";
-import {Group, Teacher, WithId} from "ggtu-timetable-api-client";
+import {Teacher} from "ggtu-timetable-api-client";
 import {api} from "@/api";
 import Field from "@/components/forms/Field.vue";
 import Form from "@/components/forms/Form.vue";
-import {CREATE_ENTITY, UPDATE_ENTITY} from "@/store/entities/action-types";
 import {namespace} from "vuex-class";
-import EntityView from "@/mixins/EntityView";
+import entityView from "@/mixins/EntityView";
 
 const groups = namespace('groups');
 
@@ -23,11 +22,9 @@ const groups = namespace('groups');
   name: 'GroupView',
   components: {Page, Form, Field}
 })
-export default class GroupView extends EntityView<Group> {
+export default class GroupView extends entityView(groups) {
   redirectRoute = '/groups';
   isLoading = false;
-  @groups.Action(UPDATE_ENTITY) update!: (group: WithId<Group>) => Promise<void>;
-  @groups.Action(CREATE_ENTITY) create!: (group: Group) => Promise<void>;
 
   get title(): string {
     return this.$route.params.id ? 'Редактирование группы' : 'Добавление группы';
