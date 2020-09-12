@@ -9,7 +9,7 @@
 <script lang="ts">
 import {Component} from "vue-property-decorator";
 import Page from "./Page.vue";
-import {Teacher} from "ggtu-timetable-api-client";
+import {Lesson, WithId} from "ggtu-timetable-api-client";
 import {api} from "@/api";
 import Field from "@/components/forms/Field.vue";
 import Form from "@/components/forms/Form.vue";
@@ -30,10 +30,9 @@ export default class LessonView extends entityView(lessons) {
     return this.$route.params.id ? 'Редактирование группы' : 'Добавление группы';
   }
 
-  getEntity = (id: number): Promise<Teacher> => {
-    return api.groups.get(id);
+  getEntity = (id: number): Promise<WithId<Lesson>> => {
+    return api.lessons.get(id);
   }
-
 }
 </script>
 

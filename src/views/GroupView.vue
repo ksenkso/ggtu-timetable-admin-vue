@@ -9,7 +9,7 @@
 <script lang="ts">
 import {Component} from "vue-property-decorator";
 import Page from "./Page.vue";
-import {Teacher} from "ggtu-timetable-api-client";
+import {Group, WithId} from "ggtu-timetable-api-client";
 import {api} from "@/api";
 import Field from "@/components/forms/Field.vue";
 import Form from "@/components/forms/Form.vue";
@@ -30,7 +30,7 @@ export default class GroupView extends entityView(groups) {
     return this.$route.params.id ? 'Редактирование группы' : 'Добавление группы';
   }
 
-  getEntity = (id: number): Promise<Teacher> => {
+  getEntity = (id: number): Promise<WithId<Group>> => {
     return api.groups.get(id);
   }
 
