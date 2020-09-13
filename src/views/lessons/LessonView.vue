@@ -8,7 +8,7 @@
 
 <script lang="ts">
 import {Component} from "vue-property-decorator";
-import Page from "./Page.vue";
+import Page from "../Page.vue";
 import {Lesson, WithId} from "ggtu-timetable-api-client";
 import {api} from "@/api";
 import Field from "@/components/forms/Field.vue";

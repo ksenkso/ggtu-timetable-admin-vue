@@ -4,7 +4,7 @@ export default [
     {
         path: '/cabinets',
         name: 'Cabinets',
-        component: () => import(/* webpackChunkName: "cabinets" */'../views/Cabinets.vue'),
+        component: () => import(/* webpackChunkName: "cabinets" */'../views/cabinets/Cabinets.vue'),
         meta: {
             private: true
         }
@@ -12,7 +12,7 @@ export default [
     {
         path: '/cabinets/create',
         name: 'CabinetCreate',
-        component: () => import(/* webpackChunkName: "groupView" */'../views/CabinetView.vue'),
+        component: () => import(/* webpackChunkName: "groupView" */'../views/cabinets/CabinetView.vue'),
         meta: {
             private: true
         }
@@ -20,7 +20,7 @@ export default [
     {
         path: '/cabinets/:id',
         name: 'CabinetView',
-        component: () => import(/* webpackChunkName: "groupView" */'../views/CabinetView.vue'),
+        component: () => import(/* webpackChunkName: "groupView" */'../views/cabinets/CabinetView.vue'),
         meta: {
             private: true
         }

@@ -4,7 +4,7 @@ export default [
     {
         path: '/groups',
         name: 'Groups',
-        component: () => import(/* webpackChunkName: "groups" */'../views/Groups.vue'),
+        component: () => import(/* webpackChunkName: "groups" */'../views/groups/Groups.vue'),
         meta: {
             private: true
         }
@@ -12,7 +12,7 @@ export default [
     {
         path: '/groups/create',
         name: 'GroupCreate',
-        component: () => import(/* webpackChunkName: "groupView" */'../views/GroupView.vue'),
+        component: () => import(/* webpackChunkName: "groupView" */'../views/groups/GroupView.vue'),
         meta: {
             private: true
         }
@@ -20,7 +20,7 @@ export default [
     {
         path: '/groups/:id',
         name: 'GroupView',
-        component: () => import(/* webpackChunkName: "groupView" */'../views/GroupView.vue'),
+        component: () => import(/* webpackChunkName: "groupView" */'../views/groups/GroupView.vue'),
         meta: {
             private: true
         }

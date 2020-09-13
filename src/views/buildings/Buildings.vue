@@ -20,14 +20,31 @@ import {namespace} from "vuex-class";
 import Page from "@/views/Page.vue";
 import EntityControls from "@/components/common/EntityControls.vue";
 import entityListPage from "@/mixins/EntityListPage";
+import {DataLoader} from "@/views/cabinets/DataLoader";
+import {Store} from "vuex";
+import {RootState} from "@/store/types";
+import {GET_ALL_ENTITIES} from "@/store/entities/action-types";
 
 const buildings = namespace('buildings');
+class BuildingsLoader implements DataLoader {
 
+  constructor(protected store: Store<RootState>) {
+
+  }
+
+  async load() {
+    await this.getAllBuildings();
+  }
+
+  private getAllBuildings() {
+    return this.store.dispatch('buildings/' + GET_ALL_ENTITIES);
+  }
+}
 @Component({
   name: 'Buildings',
   components: {Page, EntityList, EntityControls}
 })
-export default class Buildings extends entityListPage(buildings) {
+export default class Buildings extends entityListPage(buildings, BuildingsLoader) {
 
 }
 </script>

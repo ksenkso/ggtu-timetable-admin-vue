@@ -4,7 +4,7 @@ export default [
     {
         path: '/buildings',
         name: 'Buildings',
-        component: () => import(/* webpackChunkName: "buildings" */'../views/Buildings.vue'),
+        component: () => import(/* webpackChunkName: "buildings" */'../views/buildings/Buildings.vue'),
         meta: {
             private: true
         }
@@ -12,7 +12,7 @@ export default [
     {
         path: '/buildings/create',
         name: 'BuildingCreate',
-        component: () => import(/* webpackChunkName: "buildingView" */'../views/BuildingView.vue'),
+        component: () => import(/* webpackChunkName: "buildingView" */'../views/buildings/BuildingView.vue'),
         meta: {
             private: true
         }
@@ -20,7 +20,7 @@ export default [
     {
         path: '/buildings/:id',
         name: 'BuildingView',
-        component: () => import(/* webpackChunkName: "buildingView" */'../views/BuildingView.vue'),
+        component: () => import(/* webpackChunkName: "buildingView" */'../views/buildings/BuildingView.vue'),
         meta: {
             private: true
         }

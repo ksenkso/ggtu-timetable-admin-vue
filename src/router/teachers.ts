@@ -4,7 +4,7 @@ export default [
     {
         path: '/teachers',
         name: 'Teachers',
-        component: () => import(/* webpackChunkName: "teachers" */'../views/Teachers.vue'),
+        component: () => import(/* webpackChunkName: "teachers" */'../views/teachers/Teachers.vue'),
         meta: {
             private: true
         }
@@ -12,7 +12,7 @@ export default [
     {
         path: '/teachers/create',
         name: 'TeacherCreate',
-        component: () => import(/* webpackChunkName: "teacherView" */'../views/TeacherView.vue'),
+        component: () => import(/* webpackChunkName: "teacherView" */'../views/teachers/TeacherView.vue'),
         meta: {
             private: true
         }
@@ -20,7 +20,7 @@ export default [
     {
         path: '/teachers/:id',
         name: 'TeacherUpdate',
-        component: () => import(/* webpackChunkName: "teacherView" */'../views/TeacherView.vue'),
+        component: () => import(/* webpackChunkName: "teacherView" */'../views/teachers/TeacherView.vue'),
         meta: {
             private: true
         }

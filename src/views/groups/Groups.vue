@@ -1,9 +1,8 @@
 <template>
-  <Page title="Кабинеты">
+  <Page title="Группы">
     <EntityControls
-        create-route="/cabinets/create"
-        :filter-callback="filterCallback"
-    >
+        create-route="/groups/create"
+        :filter-callback="filterCallback">
     </EntityControls>
     <EntityList
         v-show="!isEmpty"
@@ -21,14 +20,31 @@ import {namespace} from 'vuex-class';
 import EntityList from "@/components/entities/EntityList.vue";
 import EntityControls from "@/components/common/EntityControls.vue";
 import entityListPage from "@/mixins/EntityListPage";
+import {GET_ALL_ENTITIES} from "@/store/entities/action-types";
+import {RootState} from "@/store/types";
+import {Store} from "vuex";
+import {DataLoader} from "@/views/cabinets/DataLoader";
 
-const cabinets = namespace('cabinets');
+const groups = namespace('groups');
+class GroupsLoader implements DataLoader {
 
+  constructor(protected store: Store<RootState>) {
+
+  }
+
+  async load() {
+    await this.getAllGroups();
+  }
+
+  private getAllGroups() {
+    return this.store.dispatch('groups/' + GET_ALL_ENTITIES);
+  }
+}
 @Component({
-  name: 'Cabinets',
+  name: 'Groups',
   components: {Page, EntityList, EntityControls}
 })
-export default class Cabinets extends entityListPage(cabinets) {
+export default class Groups extends entityListPage(groups, GroupsLoader) {
 
 }
 </script>
