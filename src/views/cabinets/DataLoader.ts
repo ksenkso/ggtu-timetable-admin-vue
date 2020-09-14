@@ -2,7 +2,7 @@ import {Store} from "vuex";
 import {RootState} from "@/store/types";
 
 export interface DataLoaderConstructor {
-    new(store: Store<RootState>): DataLoader;
+    new(store: Store<RootState>, ...args: any[]): DataLoader;
 }
 
 export interface DataLoader {
