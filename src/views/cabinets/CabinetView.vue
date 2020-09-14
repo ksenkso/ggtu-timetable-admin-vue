@@ -4,7 +4,7 @@
       <Field label="Название" name="name" :initial-value="model.name"></Field>
       <Field label="Здание" name="buildingId">
         <template v-slot:input="{updateValue}">
-          <Select name="buildingId" @change.native="updateValue($event.target.value)" :options="buildings"></Select>
+          <Select :initial-value="model.buildingId" name="buildingId" @change.native="updateValue($event.target.value)" :options="buildings"></Select>
         </template>
       </Field>
     </Form>
@@ -28,12 +28,12 @@ const cabinets = namespace('cabinets');
   name: 'BuildingView',
   components: {Page, Form, Field, Select}
 })
-export default class BuildingView extends entityView(cabinets) {
+export default class CabinetView extends entityView<Cabinet>(cabinets) {
   redirectRoute = '/cabinets';
   buildings: SelectOption[] = [];
 
   get title(): string {
-    return this.$route.params.id ? 'Редактирование здания' : 'Добавление здания';
+    return this.$route.params.id ? 'Редактирование кабинета' : 'Добавление кабинета';
   }
 
   getEntity = (id: number): Promise<WithId<Cabinet>> => {

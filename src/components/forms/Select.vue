@@ -1,5 +1,5 @@
 <template>
-  <select :name="name" :id="id" @change="onChange" class="form__control">
+  <select :name="name" :id="id" @change="onChange" class="form__control" :value="value">
     <option v-for="(option, index) in options" :key="index" :value="option.value">{{ option.name }}</option>
   </select>
 </template>
@@ -18,13 +18,15 @@ export interface SelectOption {
 export default class Select extends Vue {
   @Prop({required: true}) name!: string;
   @Prop({required: true}) options!: SelectOption[];
-
+  @Prop() initialValue: any;
+  value: any = null;
   get id() {
     return `${this.name}_${this.$vnode.tag}`;
   }
 
   mounted() {
-    this.$emit('change', {target: {value: this.options[0].value}});
+    this.value = this.initialValue ? this.initialValue : this.options[0].value;
+    this.$emit('change', {target: {value: this.value}});
   }
 
   onChange(event: Event) {
