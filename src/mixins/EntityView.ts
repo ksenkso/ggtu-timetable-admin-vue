@@ -30,12 +30,12 @@ export default function entityView(context: BindingHelpers) {
         @context.Action(UPDATE_ENTITY) update!: (entity: WithId<NamedEntity>) => Promise<void>;
         @context.Action(CREATE_ENTITY) create!: (entity: NamedEntity) => Promise<void>;
 
-        onSubmit({name}: {name: string}) {
+        onSubmit(data: NamedEntity) {
             let request;
             if (this.model?.id) {
-                request = this.update({name, id: this.model.id});
+                request = this.update({...data, id: this.model.id});
             } else {
-                request = this.create({name});
+                request = this.create({...data});
             }
 
             request.then(() => {
