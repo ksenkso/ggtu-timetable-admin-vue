@@ -26,7 +26,6 @@ import {GET_ALL_ENTITIES} from "@/store/entities/action-types";
 import {AbstractDataLoader} from "@/views/cabinets/DataLoader";
 import {Store} from "vuex";
 import {RootState} from "@/store/types";
-import Alert from "@/components/common/Alert.vue";
 
 const lessons = namespace('lessons');
 
@@ -44,7 +43,7 @@ class LessonsLoader extends AbstractDataLoader {
 
 @Component({
   name: 'Lessons',
-  components: {Page, EntityControls, EntityList, Alert}
+  components: {Page, EntityControls, EntityList}
 })
 export default class Lessons extends entityListPage(lessons, LessonsLoader) {
 

@@ -26,7 +26,6 @@ import {GET_ALL_ENTITIES} from "@/store/entities/action-types";
 import {RootState} from "@/store/types";
 import {Store} from "vuex";
 import {AbstractDataLoader} from "@/views/cabinets/DataLoader";
-import Alert from "@/components/common/Alert.vue";
 
 const groups = namespace('groups');
 
@@ -44,7 +43,7 @@ class GroupsLoader extends AbstractDataLoader {
 
 @Component({
   name: 'Groups',
-  components: {Page, EntityList, EntityControls, Alert}
+  components: {Page, EntityList, EntityControls}
 })
 export default class Groups extends entityListPage(groups, GroupsLoader) {
 

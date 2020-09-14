@@ -34,7 +34,6 @@ import {NamedEntityDict} from "@/store/entities/types";
 import {Store} from "vuex";
 import {RootState} from "@/store/types";
 import {AbstractDataLoader} from "@/views/cabinets/DataLoader";
-import Alert from "@/components/common/Alert.vue";
 
 const cabinets = namespace('cabinets');
 const buildings = namespace('buildings');
@@ -53,7 +52,7 @@ class CabinetsLoader extends AbstractDataLoader{
 
 @Component({
   name: 'Cabinets',
-  components: {Page, EntityList, EntityControls, Alert}
+  components: {Page, EntityList, EntityControls}
 })
 export default class Cabinets extends entityListPage(cabinets, CabinetsLoader) {
 
