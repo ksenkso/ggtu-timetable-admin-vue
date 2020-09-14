@@ -5,6 +5,8 @@
         :filter-callback="filterCallback"
     >
     </EntityControls>
+    <Alert v-if="isEmpty && dataLoader.loaded" theme="warning">Записи не найдены</Alert>
+    <Alert theme="info" v-if="dataLoader.isLoading">Загрузка...</Alert>
     <EntityList
         v-if="!isEmpty && !isBuildingsEmpty"
         :entities="filteredEntities"
@@ -32,6 +34,7 @@ import {NamedEntityDict} from "@/store/entities/types";
 import {Store} from "vuex";
 import {RootState} from "@/store/types";
 import {AbstractDataLoader} from "@/views/cabinets/DataLoader";
+import Alert from "@/components/common/Alert.vue";
 
 const cabinets = namespace('cabinets');
 const buildings = namespace('buildings');
@@ -50,7 +53,7 @@ class CabinetsLoader extends AbstractDataLoader{
 
 @Component({
   name: 'Cabinets',
-  components: {Page, EntityList, EntityControls}
+  components: {Page, EntityList, EntityControls, Alert}
 })
 export default class Cabinets extends entityListPage(cabinets, CabinetsLoader) {
 

@@ -4,6 +4,8 @@
         create-route="/groups/create"
         :filter-callback="filterCallback">
     </EntityControls>
+    <Alert v-if="isEmpty && dataLoader.loaded" theme="warning">Записи не найдены</Alert>
+    <Alert theme="info" v-if="dataLoader.isLoading">Загрузка...</Alert>
     <EntityList
         v-show="!isEmpty"
         :entities="filteredEntities"
@@ -24,6 +26,7 @@ import {GET_ALL_ENTITIES} from "@/store/entities/action-types";
 import {RootState} from "@/store/types";
 import {Store} from "vuex";
 import {AbstractDataLoader} from "@/views/cabinets/DataLoader";
+import Alert from "@/components/common/Alert.vue";
 
 const groups = namespace('groups');
 class GroupsLoader extends AbstractDataLoader {
@@ -39,7 +42,7 @@ class GroupsLoader extends AbstractDataLoader {
 }
 @Component({
   name: 'Groups',
-  components: {Page, EntityList, EntityControls}
+  components: {Page, EntityList, EntityControls, Alert}
 })
 export default class Groups extends entityListPage(groups, GroupsLoader) {
 

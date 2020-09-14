@@ -4,6 +4,8 @@
         create-route="/buildings/create"
         :filter-callback="filterCallback">
     </EntityControls>
+    <Alert v-if="isEmpty && dataLoader.loaded" theme="warning">Записи не найдены</Alert>
+    <Alert theme="info" v-if="dataLoader.isLoading">Загрузка...</Alert>
     <EntityList
         v-show="!isEmpty"
         :entities="filteredEntities"
@@ -24,6 +26,7 @@ import {AbstractDataLoader} from "@/views/cabinets/DataLoader";
 import {Store} from "vuex";
 import {RootState} from "@/store/types";
 import {GET_ALL_ENTITIES} from "@/store/entities/action-types";
+import Alert from "@/components/common/Alert.vue";
 
 const buildings = namespace('buildings');
 class BuildingsLoader extends AbstractDataLoader{
@@ -39,7 +42,7 @@ class BuildingsLoader extends AbstractDataLoader{
 }
 @Component({
   name: 'Buildings',
-  components: {Page, EntityList, EntityControls}
+  components: {Page, EntityList, EntityControls, Alert}
 })
 export default class Buildings extends entityListPage(buildings, BuildingsLoader) {
 

@@ -4,6 +4,8 @@
         create-route="/lessons/create"
         :filter-callback="filterCallback">
     </EntityControls>
+    <Alert v-if="isEmpty && dataLoader.loaded" theme="warning">Записи не найдены</Alert>
+    <Alert theme="info" v-if="dataLoader.isLoading">Загрузка...</Alert>
     <EntityList
         v-show="!isEmpty"
         :entities="filteredEntities"
@@ -24,6 +26,7 @@ import {GET_ALL_ENTITIES} from "@/store/entities/action-types";
 import {AbstractDataLoader} from "@/views/cabinets/DataLoader";
 import {Store} from "vuex";
 import {RootState} from "@/store/types";
+import Alert from "@/components/common/Alert.vue";
 
 const lessons = namespace('lessons');
 class LessonsLoader extends AbstractDataLoader {
@@ -39,7 +42,7 @@ class LessonsLoader extends AbstractDataLoader {
 }
 @Component({
   name: 'Lessons',
-  components: {Page, EntityControls, EntityList}
+  components: {Page, EntityControls, EntityList, Alert}
 })
 export default class Lessons extends entityListPage(lessons, LessonsLoader) {
 
