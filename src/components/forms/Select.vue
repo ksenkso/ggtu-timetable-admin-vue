@@ -4,32 +4,33 @@
   </select>
 </template>
 
-<script>
-export default {
-  name: 'Select',
-  props: {
-    name: {
-      type: String,
-      required: true
-    },
-    options: {
-      type: Array,
-      required: true
-    }
-  },
-  computed: {
-    id() {
-      return `${this.name}_${this.$vnode.tag}`;
-    }
-  },
+<script lang="ts">
+import {Component, Prop, Vue} from 'vue-property-decorator';
+
+export interface SelectOption {
+  name: string;
+  value: any;
+}
+
+@Component({
+  name: 'Select'
+})
+export default class Select extends Vue {
+  @Prop({required: true}) name!: string;
+  @Prop({required: true}) options!: SelectOption[];
+
+  get id() {
+    return `${this.name}_${this.$vnode.tag}`;
+  }
+
   mounted() {
     this.$emit('change', {target: {value: this.options[0].value}});
-  },
-  methods: {
-    onChange(event) {
-      this.$emit('change', this.options[event.target.selectedIndex].value);
-    }
   }
+
+  onChange(event: Event) {
+    this.$emit('change', this.options[(event.target as HTMLSelectElement).selectedIndex].value);
+  }
+
 }
 </script>
 
