@@ -4,8 +4,10 @@
         create-route="/teachers/create"
         :filter-callback="filterCallback">
     </EntityControls>
+    <Alert v-if="isEmpty && dataLoader.loaded" theme="warning">Записи не найдены</Alert>
+    <Alert theme="info" v-if="dataLoader.isLoading">Загрузка...</Alert>
     <EntityList
-        v-show="!isEmpty"
+        v-show="dataLoader.loaded && !isEmpty"
         :entities="filteredEntities"
         editRoute="/teachers"
         :deleteCallback="deleteCallback"
@@ -24,15 +26,22 @@ import {GET_ALL_ENTITIES} from "@/store/entities/action-types";
 import {DataLoader} from "@/views/cabinets/DataLoader";
 import {Store} from "vuex";
 import {RootState} from "@/store/types";
+import Alert from "@/components/common/Alert.vue";
 
 const teachers = namespace('teachers');
 class TeachersLoader implements DataLoader {
+
+  loaded = false;
+  isLoading = false;
 
   constructor(protected store: Store<RootState>) {
   }
 
   async load() {
+    this.isLoading = true;
     await this.getAllTeachers();
+    this.isLoading = false;
+    this.loaded = true;
   }
 
   private getAllTeachers() {
@@ -41,7 +50,7 @@ class TeachersLoader implements DataLoader {
 }
 @Component({
   name: 'Teachers',
-  components: {Page, EntityList, EntityControls}
+  components: {Page, EntityList, EntityControls, Alert}
 })
 export default class Teachers extends entityListPage(teachers, TeachersLoader) {
 

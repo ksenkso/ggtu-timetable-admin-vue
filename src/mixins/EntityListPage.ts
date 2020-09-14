@@ -11,6 +11,7 @@ export interface ListPage {
     filteredEntities: NamedEntityDict;
     deleteCallback: (id: number) => Promise<void>;
     filterCallback: (filter: string) => void;
+    dataLoader: DataLoader;
 }
 
 export default function entityListPage(context: BindingHelpers, DataLoader: DataLoaderConstructor): VueClass<ListPage> {

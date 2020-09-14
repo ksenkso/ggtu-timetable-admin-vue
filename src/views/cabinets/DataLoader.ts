@@ -5,6 +5,7 @@ export interface DataLoaderConstructor {
     new (store: Store<RootState>): DataLoader;
 }
 export interface DataLoader {
-
+    loaded: boolean;
+    isLoading: boolean;
     load(): Promise<void> | void;
 }
