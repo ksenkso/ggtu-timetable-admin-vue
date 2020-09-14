@@ -5,7 +5,7 @@ import {CREATE_ENTITY, UPDATE_ENTITY} from "@/store/entities/action-types";
 import {WithId} from "ggtu-timetable-api-client";
 import {NamedEntity} from "@/store/entities/types";
 
-export default function entityView(context: BindingHelpers) {
+export default function entityView<T extends NamedEntity>(context: BindingHelpers) {
 
     Component.registerHooks([
         'beforeRouteEnter',
@@ -24,13 +24,13 @@ export default function entityView(context: BindingHelpers) {
         }
 
         redirectRoute: RawLocation = '/';
-        model: NamedEntity | null = null;
-        getEntity!: (id: number) => Promise<WithId<NamedEntity>>;
+        model: T | null = null;
+        getEntity!: (id: number) => Promise<WithId<T>>;
 
-        @context.Action(UPDATE_ENTITY) update!: (entity: WithId<NamedEntity>) => Promise<void>;
-        @context.Action(CREATE_ENTITY) create!: (entity: NamedEntity) => Promise<void>;
+        @context.Action(UPDATE_ENTITY) update!: (entity: WithId<T>) => Promise<void>;
+        @context.Action(CREATE_ENTITY) create!: (entity: T) => Promise<void>;
 
-        onSubmit(data: NamedEntity) {
+        onSubmit(data: T) {
             let request;
             if (this.model?.id) {
                 request = this.update({...data, id: this.model.id});
