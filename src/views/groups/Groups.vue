@@ -29,6 +29,7 @@ import {AbstractDataLoader} from "@/views/cabinets/DataLoader";
 import Alert from "@/components/common/Alert.vue";
 
 const groups = namespace('groups');
+
 class GroupsLoader extends AbstractDataLoader {
 
   constructor(store: Store<RootState>) {
@@ -40,6 +41,7 @@ class GroupsLoader extends AbstractDataLoader {
   }
 
 }
+
 @Component({
   name: 'Groups',
   components: {Page, EntityList, EntityControls, Alert}

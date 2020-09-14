@@ -29,7 +29,8 @@ import {GET_ALL_ENTITIES} from "@/store/entities/action-types";
 import Alert from "@/components/common/Alert.vue";
 
 const buildings = namespace('buildings');
-class BuildingsLoader extends AbstractDataLoader{
+
+class BuildingsLoader extends AbstractDataLoader {
 
   constructor(store: Store<RootState>) {
     super(store);
@@ -40,6 +41,7 @@ class BuildingsLoader extends AbstractDataLoader{
   }
 
 }
+
 @Component({
   name: 'Buildings',
   components: {Page, EntityList, EntityControls, Alert}
