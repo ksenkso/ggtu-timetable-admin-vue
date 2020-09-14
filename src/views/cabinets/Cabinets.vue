@@ -8,7 +8,7 @@
     <Alert v-if="isEmpty && dataLoader.loaded" theme="warning">Записи не найдены</Alert>
     <Alert theme="info" v-if="dataLoader.isLoading">Загрузка...</Alert>
     <EntityList
-        v-if="!isEmpty && !isBuildingsEmpty"
+        v-if="!isEmpty && dataLoader.loaded"
         :entities="filteredEntities"
         editRoute="/cabinets"
         :deleteCallback="deleteCallback"
