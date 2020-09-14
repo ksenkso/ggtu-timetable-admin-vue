@@ -16,6 +16,9 @@ export default function entityView(context: BindingHelpers) {
    })
     class EntityView extends Vue {
 
+        isLoading = false;
+        loaded = false;
+
         get title(): string {
             return this.$route.params.id ? 'Редактирование' : 'Добавление';
         }
@@ -43,9 +46,12 @@ export default function entityView(context: BindingHelpers) {
         beforeRouteEnter(to: Route, from: Route, next: NavigationGuardNext) {
             next((vm: Vue) => {
                 if (to.params.id) {
+                    (vm as EntityView).isLoading = true;
                     (vm as EntityView).getEntity(+to.params.id)
                         .then((model) => {
                             (vm as any).model = model;
+                            (vm as EntityView).isLoading = false;
+                            (vm as EntityView).loaded = true;
                             next();
                         });
                 } else {

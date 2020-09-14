@@ -1,5 +1,7 @@
 <template>
   <Page :title="title">
+    <Alert theme="info" v-if="isLoading">Загрузка...</Alert>
+    <Alert theme="danger" v-if="loaded && !model">Ошибка ((</Alert>
     <Form v-if="model" send-button-text="Сохранить" @submit="onSubmit">
       <Field label="Название" name="name" :initial-value="model.name"></Field>
     </Form>
@@ -15,17 +17,16 @@ import Field from "@/components/forms/Field.vue";
 import Form from "@/components/forms/Form.vue";
 import {namespace} from "vuex-class";
 import entityView from "@/mixins/EntityView";
+import Alert from "@/components/common/Alert.vue";
 
 const lessons = namespace('lessons');
 
 @Component({
   name: 'GroupView',
-  components: {Page, Form, Field}
+  components: {Page, Form, Field, Alert}
 })
 export default class LessonView extends entityView(lessons) {
   redirectRoute = '/lessons';
-  isLoading = false;
-
   get title(): string {
     return this.$route.params.id ? 'Редактирование группы' : 'Добавление группы';
   }
