@@ -23,31 +23,24 @@ import Page from "@/views/Page.vue";
 import EntityControls from "@/components/common/EntityControls.vue";
 import entityListPage from "@/mixins/EntityListPage";
 import {GET_ALL_ENTITIES} from "@/store/entities/action-types";
-import {DataLoader} from "@/views/cabinets/DataLoader";
+import {AbstractDataLoader} from "@/views/cabinets/DataLoader";
 import {Store} from "vuex";
 import {RootState} from "@/store/types";
 import Alert from "@/components/common/Alert.vue";
 
 const teachers = namespace('teachers');
-class TeachersLoader implements DataLoader {
 
-  loaded = false;
-  isLoading = false;
+class TeachersLoader extends AbstractDataLoader {
 
-  constructor(protected store: Store<RootState>) {
+  constructor(store: Store<RootState>) {
+    super(store);
   }
 
-  async load() {
-    this.isLoading = true;
-    await this.getAllTeachers();
-    this.isLoading = false;
-    this.loaded = true;
-  }
-
-  private getAllTeachers() {
+  load() {
     return this.store.dispatch('teachers/' + GET_ALL_ENTITIES);
   }
 }
+
 @Component({
   name: 'Teachers',
   components: {Page, EntityList, EntityControls, Alert}

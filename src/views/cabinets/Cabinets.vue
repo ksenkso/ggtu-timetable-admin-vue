@@ -31,26 +31,20 @@ import {GET_ALL_ENTITIES} from "@/store/entities/action-types";
 import {NamedEntityDict} from "@/store/entities/types";
 import {Store} from "vuex";
 import {RootState} from "@/store/types";
-import {DataLoader} from "@/views/cabinets/DataLoader";
+import {AbstractDataLoader} from "@/views/cabinets/DataLoader";
 
 const cabinets = namespace('cabinets');
 const buildings = namespace('buildings');
 
-class CabinetsLoader implements DataLoader {
+class CabinetsLoader extends AbstractDataLoader{
 
-  constructor(protected store: Store<RootState>) {}
-
-  private getAllBuildings() {
-    return this.store.dispatch('buildings/' + GET_ALL_ENTITIES);
-  }
-
-  private getAllCabinets() {
-    return this.store.dispatch('cabinets/' + GET_ALL_ENTITIES);
+  constructor(store: Store<RootState>) {
+    super(store);
   }
 
   async load() {
-    await this.getAllBuildings();
-    await this.getAllCabinets();
+    await this.store.dispatch('buildings/' + GET_ALL_ENTITIES);
+    return this.store.dispatch('cabinets/' + GET_ALL_ENTITIES);
   }
 }
 

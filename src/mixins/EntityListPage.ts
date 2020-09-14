@@ -27,7 +27,7 @@ export default function entityListPage(context: BindingHelpers, DataLoader: Data
         @context.Mutation(SET_FILTER) filterCallback!: (filter: string) => void;
 
         mounted() {
-            this.dataLoader.load();
+            return this.dataLoader.startLoading();
         }
     }
 

@@ -21,22 +21,21 @@ import EntityList from "../../components/entities/EntityList.vue";
 import {namespace} from "vuex-class";
 import entityListPage from "@/mixins/EntityListPage";
 import {GET_ALL_ENTITIES} from "@/store/entities/action-types";
+import {AbstractDataLoader} from "@/views/cabinets/DataLoader";
 import {Store} from "vuex";
 import {RootState} from "@/store/types";
-import {DataLoader} from "@/views/cabinets/DataLoader";
 
 const lessons = namespace('lessons');
-class LessonsLoader implements DataLoader {
+class LessonsLoader extends AbstractDataLoader {
 
-  constructor(protected store: Store<RootState>) {}
+  constructor(store: Store<RootState>) {
+    super(store);
+  }
 
   async load() {
-    await this.getAllLessons();
-  }
-
-  private getAllLessons() {
     return this.store.dispatch('lessons/' + GET_ALL_ENTITIES);
   }
+
 }
 @Component({
   name: 'Lessons',

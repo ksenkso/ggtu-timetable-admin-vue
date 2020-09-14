@@ -23,22 +23,19 @@ import entityListPage from "@/mixins/EntityListPage";
 import {GET_ALL_ENTITIES} from "@/store/entities/action-types";
 import {RootState} from "@/store/types";
 import {Store} from "vuex";
-import {DataLoader} from "@/views/cabinets/DataLoader";
+import {AbstractDataLoader} from "@/views/cabinets/DataLoader";
 
 const groups = namespace('groups');
-class GroupsLoader implements DataLoader {
+class GroupsLoader extends AbstractDataLoader {
 
-  constructor(protected store: Store<RootState>) {
-
+  constructor(store: Store<RootState>) {
+    super(store);
   }
 
   async load() {
-    await this.getAllGroups();
-  }
-
-  private getAllGroups() {
     return this.store.dispatch('groups/' + GET_ALL_ENTITIES);
   }
+
 }
 @Component({
   name: 'Groups',
