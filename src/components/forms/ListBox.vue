@@ -18,6 +18,7 @@
            type="text"
            class="list-box__input"
            v-model="displayValue"
+           @blur="onBlur"
            @input="onInput"
            @keydown.space.enter="onKeyboardSelect"
            @keydown.up="moveSelection(-1)"
@@ -46,8 +47,8 @@ export default class ListBox extends Vue {
         : this.options;
   }
 
-  log(e: KeyboardEvent) {
-    console.log(e.code);
+  onBlur() {
+    this.forceHideOptions = true;
   }
 
   onKeyboardSelect(e: KeyboardEvent) {
@@ -94,6 +95,11 @@ export default class ListBox extends Vue {
       if (!this.matches(this.selected, this.displayValue)) {
         this.selected = null;
       }
+    } else {
+      if (this.filteredOptions.length) {
+        this.selectedIndex = 0;
+        this.selected = this.filteredOptions[this.selectedIndex]
+      }
     }
   }
 
@@ -129,7 +135,8 @@ export default class ListBox extends Vue {
     border-radius: 0 0 3px 3px
     max-height: 8 * 35px
     overflow: hidden
-
+    z-index: 999
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, .13)
     ~ .list-box__input
       border-radius: 3px 3px 0 0
 
