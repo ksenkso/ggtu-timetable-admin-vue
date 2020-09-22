@@ -50,8 +50,7 @@ export default class ListBox extends Vue {
   }
 
   onKeyboardSelect(e: KeyboardEvent) {
-    console.log('key')
-    if (this.selectedIndex) {
+    if (this.selectedIndex !== null) {
       e.preventDefault();
       this.selectOption(this.selectedIndex);
     }
@@ -78,7 +77,7 @@ export default class ListBox extends Vue {
   }
 
   selectOption(index: number) {
-    this.selected = this.options[index];
+    this.selected = this.filteredOptions[index];
     this.displayValue = this.selected.name;
     this.forceHideOptions = true;
     this.$emit('select', this.selected.value);
