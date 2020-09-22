@@ -33,7 +33,14 @@ export default {
       this.$slots.default?.forEach(node => {
         const name = node.componentInstance.$options.name
         if (name === 'Field') {
-          data[node.componentInstance?.$props.name] = node.componentInstance?.$data.value;
+          // if a form already has value with the name of this field,
+          // make an array that will contain all values for this name in order
+          // that they appear in the DOM
+          if (data[node.componentInstance?.$props.name]) {
+            data[node.componentInstance?.$props.name] = [data[node.componentInstance?.$props.name], node.componentInstance?.$data.value];
+          } else {
+            data[node.componentInstance?.$props.name] = node.componentInstance?.$data.value;
+          }
         }
       });
       this.$emit('submit', data);
