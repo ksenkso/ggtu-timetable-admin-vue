@@ -6,6 +6,7 @@ import teachers from "@/router/teachers";
 import groups from "@/router/groups";
 import cabinets from "@/router/cabinets";
 import buildings from "@/router/buildings";
+import timetable from "@/router/timetable";
 
 Vue.use(VueRouter)
 
@@ -25,6 +26,7 @@ const routes: Array<RouteConfig> = [
     ...lessons,
     ...cabinets,
     ...buildings,
+    ...timetable,
 ]
 
 const router = new VueRouter({
