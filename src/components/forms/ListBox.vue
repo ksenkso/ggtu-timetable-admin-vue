@@ -1,5 +1,19 @@
 <template>
   <div class="form__list-box list-box">
+    <div
+        class="list-box__options"
+        v-if="showOptions"
+        @click="onOptionClick"
+    >
+      <div class="list-box__option list-box__option_empty" v-show="!filteredOptions.length">Нет опций</div>
+      <div
+          v-for="(option, index) in filteredOptions"
+          :data-index="index"
+          :key="option.value"
+          :class="`list-box__option${selected && selected.value === option.value ? ' list-box__option_selected' : ''}`">
+        {{ option.name }}
+      </div>
+    </div>
     <input ref="input"
            type="text"
            class="list-box__input"
@@ -9,19 +23,6 @@
            @keydown.up="moveSelection(-1)"
            @keydown.down="moveSelection(1)"
     >
-    <div
-        class="list-box__options"
-        v-show="showOptions"
-        @click="onOptionClick"
-    >
-      <div
-          v-for="(option, index) in filteredOptions"
-          :data-index="index"
-          :key="option.value"
-          :class="`list-box__option${selected && selected.value === option.value && ' list-box__option_selected'}`">
-        {{ option.name }}
-      </div>
-    </div>
   </div>
 </template>
 
@@ -71,9 +72,9 @@ export default class ListBox extends Vue {
   onOptionClick(e: MouseEvent) {
     const target = e.target as HTMLElement;
     // typescript will scream if i will not check for undefined
-    const index = target.dataset.index ? +target.dataset.index : 0;
-    console.log(index);
-    this.selectOption(index);
+    if (target.dataset.index !== undefined) {
+      this.selectOption(+target.dataset.index);
+    }
   }
 
   selectOption(index: number) {
@@ -105,7 +106,44 @@ export default class ListBox extends Vue {
 <style scoped lang="sass">
 @import "../../assets/functions"
 .list-box
+  position: relative
+
+  &__input
+    width: 100%
+    box-sizing: border-box
+    display: block
+    border: 1px solid #aaa
+    border-radius: 3px
+    padding: 6px 8px 2px 8px
+    &:focus
+      outline-color: scale-color(theme-color("primary"), $lightness: 30%)
+      border-bottom-left-radius: 0
+      border-bottom-right-radius: 0
+      outline-offset: 0
+  &__options
+    position: absolute
+    top: 100%
+    width: 100%
+    background-color: #ffffff
+    border: 1px solid #ddd
+    border-radius: 0 0 3px 3px
+    max-height: 8 * 35px
+    overflow: hidden
+
+    ~ .list-box__input
+      border-radius: 3px 3px 0 0
+
   &__option
+    padding: 4px
+    border-bottom: 1px solid #ddd
+
+    &:last-child
+      border-bottom: none
+
     &_selected
-      background-color: rgba(theme-color("primary"), .5)
+      background-color: rgba(theme-color("primary"), .3)
+
+    &_empty
+      cursor: not-allowed
+
 </style>
