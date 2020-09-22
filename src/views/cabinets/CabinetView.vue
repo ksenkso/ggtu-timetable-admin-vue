@@ -20,7 +20,8 @@ import Field from "@/components/forms/Field.vue";
 import {namespace} from "vuex-class";
 import entityView from "@/mixins/EntityView";
 import {api} from "@/api";
-import Select, {SelectOption} from "@/components/forms/Select.vue";
+import Select from "@/components/forms/Select.vue";
+import {SelectOption} from "@/utils/lists";
 
 const cabinets = namespace('cabinets');
 

@@ -6,11 +6,8 @@
 
 <script lang="ts">
 import {Component, Prop, Vue} from 'vue-property-decorator';
+import {SelectOption} from "@/utils/lists";
 
-export interface SelectOption {
-  name: string;
-  value: any;
-}
 
 @Component({
   name: 'Select'

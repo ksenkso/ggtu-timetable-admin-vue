@@ -29,7 +29,7 @@
 
 <script lang="ts">
 import {Component, Prop, Vue} from 'vue-property-decorator';
-import {SelectOption} from "./Select.vue";
+import {SelectOption} from "@/utils/lists";
 
 @Component({
   name: 'ListBox'

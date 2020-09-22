@@ -1,6 +1,10 @@
 import {NamedEntity} from "@/store/entities/types";
-import {SelectOption} from "@/components/forms/Select.vue";
 import {Cabinet} from "ggtu-timetable-api-client";
+
+export interface SelectOption {
+    name: string;
+    value: any;
+}
 
 export const defaultEntityAdapter = (list: NamedEntity[]): SelectOption[] => {
     return list.map(entity => ({value: entity.id, name: entity.name}));
