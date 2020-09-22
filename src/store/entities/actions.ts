@@ -10,19 +10,19 @@ import { EntityType, WithId } from 'ggtu-timetable-api-client';
 const createActions = (type: EntityType): ActionTree<EntitiesState, RootState> => {
     return {
         [CREATE_ENTITY](context, entity: NamedEntity) {
-            return api.getEntrypoint(type).create(entity)
+            return api.getEndpoint(type).create(entity)
                 .then(created => context.commit(ADD_ENTITY, created));
         },
         [GET_ALL_ENTITIES](context) {
-            return api.getEntrypoint(type).getAll()
+            return api.getEndpoint(type).getAll()
                 .then(entities => context.commit(SET_ALL_ENTITIES, entities));
         },
         [UPDATE_ENTITY](context, entity: WithId<NamedEntity>) {
-            return api.getEntrypoint(type).update(entity.id, entity)
+            return api.getEndpoint(type).update(entity.id, entity)
                 .then(updated => context.commit(SET_ENTITY, entity.id, updated));
         },
         [DELETE_ENTITY](context, id: number) {
-            return api.getEntrypoint(type).delete(id)
+            return api.getEndpoint(type).delete(id)
                 .then(() => context.commit(REMOVE_ENTITY, id));
         }
     }
