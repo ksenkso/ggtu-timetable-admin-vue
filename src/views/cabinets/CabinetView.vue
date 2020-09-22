@@ -4,7 +4,7 @@
       <Field label="Название" name="name" :initial-value="model.name"></Field>
       <Field label="Здание" name="buildingId">
         <template v-slot:input="{updateValue}">
-          <Select :initial-value="model.buildingId" name="buildingId" @change.native="updateValue($event.target.value)" :options="buildings"></Select>
+          <Select :initial-value="model.buildingId" name="buildingId" @change="updateValue" :options="buildings"></Select>
         </template>
       </Field>
     </Form>

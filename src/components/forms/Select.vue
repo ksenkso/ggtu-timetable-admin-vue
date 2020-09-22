@@ -25,8 +25,8 @@ export default class Select extends Vue {
   }
 
   mounted() {
-    this.value = this.initialValue ? this.initialValue : this.options[0].value;
-    this.$emit('change', {target: {value: this.value}});
+    this.value = this.initialValue !== undefined ? this.initialValue : this.options[0].value;
+    this.$emit('change', this.value);
   }
 
   onChange(event: Event) {
