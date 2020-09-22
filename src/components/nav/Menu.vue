@@ -32,6 +32,7 @@ export default class Menu extends Vue {
     {link: '/lessons', text: 'Предметы'},
     {link: '/buildings', text: 'Здания'},
     {link: '/cabinets', text: 'Кабинеты'},
+    {link: '/timetable/1/edit', text: 'Расписание'},
   ];
 }
 </script>
