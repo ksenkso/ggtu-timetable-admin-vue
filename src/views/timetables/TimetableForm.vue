@@ -3,8 +3,10 @@
     <WeekPicker :default-week="week" @change="setWeek"></WeekPicker>
     <DayPicker :default-day="day" @change="setDay"></DayPicker>
     <div class="fragments" v-if="loaded">
-      <TimetableFormFragment ref="forms" v-for="entry in entries" :key="entry.id" :entry="entry"
-                             :group="group"></TimetableFormFragment>
+      <div class="lesson" v-for="(entry, index) in entries" :key="index">
+        <h3>Пара {{ index + 1 }}</h3>
+        <component :is="componentForEntry(entry)" ref="forms" :entry="entry"></component>
+      </div>
     </div>
     <div class="buttons">
       <Button theme="primary" class="button_block" @click.native="addForm">Добавить занятие</Button>
@@ -24,7 +26,7 @@ import {
   TimetableEntry,
   TimetableEntryDTO,
   TimetableEntryType,
-  Week
+  Week, WithId
 } from "ggtu-timetable-api-client";
 import {NavigationGuardNext, Route} from "vue-router";
 import {api} from "@/api";
@@ -37,6 +39,7 @@ import {namespace} from "vuex-class";
 import {NamedEntityDict} from "@/store/entities/types";
 import {Dictionary} from "vue-router/types/router";
 import {GET_ALL_ENTITIES} from "@/store/entities/action-types";
+import MockLesson from "@/components/timetable/MockLesson.vue";
 
 Component.registerHooks([
   'beforeRouteEnter',
@@ -46,7 +49,7 @@ const teachers = namespace('teachers');
 const lessons = namespace('lessons');
 @Component({
   name: 'TimetableForm',
-  components: {Page, TimetableFormFragment, Button, WeekPicker, DayPicker}
+  components: {Page, TimetableFormFragment, Button, WeekPicker, DayPicker, MockLesson}
 })
 export default class TimetableForm extends Vue {
 
@@ -60,8 +63,8 @@ export default class TimetableForm extends Vue {
 
   @Ref() forms!: TimetableFormFragment[];
 
-  group: Group | null = null;
-  entries: (TimetableEntry | TimetableEntryDTO)[] | null = null;
+  group: WithId<Group> | null = null;
+  entries: (TimetableEntry | TimetableEntryDTO | null)[] | null = null;
   day = 0;
   week = 0;
   entitiesLoaded = false;
@@ -72,6 +75,10 @@ export default class TimetableForm extends Vue {
 
   get loaded() {
     return this.group && this.entries && this.entitiesLoaded;
+  }
+
+  componentForEntry(entry: TimetableEntry | TimetableEntryDTO | null): string {
+    return entry === null ? 'MockLesson' : 'TimetableFormFragment';
   }
 
   setDay(day: ButtonGroupValue) {
@@ -93,7 +100,7 @@ export default class TimetableForm extends Vue {
   submitTimetable() {
     const requests = this.forms
         .map((form, index) => ({
-          groupId: this.group!.id,
+          groupId: this.group && this.group.id,
           index, // TODO: add form mockups so that blank lessons are possible, re-index lessons
           day: this.day,
           week: this.week,
@@ -112,7 +119,7 @@ export default class TimetableForm extends Vue {
 
   }
 
-  createEntry(): any {
+  createEntry(): TimetableEntryDTO | null {
     if (this.group !== null) {
       return {
         cabinetId: 0,
@@ -125,7 +132,7 @@ export default class TimetableForm extends Vue {
         week: Week.Top
       }
     }
-
+    return null;
   }
 
   mounted() {
@@ -145,12 +152,30 @@ export default class TimetableForm extends Vue {
       next('/groups');
     } else {
       next((vm: Vue) => {
+        const $this = vm as TimetableForm;
         api.groups.get(+to.params.groupId)
             .then(group => {
-              (vm as TimetableForm).group = group;
+              $this.group = group;
               api.timetable.getForGroup(group.id)
                   .then(entries => {
-                    (vm as TimetableForm).entries = entries;
+                    if (!entries.length) {
+                      $this.entries = [
+                        $this.createEntry(),
+                      ];
+                    } else {
+                      const filledEntries = [];
+                      let i = 0, j = 0;
+                      while (j < entries.length) {
+                        if (entries[j].index !== i) {
+                          filledEntries.push(null);
+                        } else {
+                          filledEntries.push(entries[j]);
+                          j++;
+                        }
+                        i++;
+                      }
+                      $this.entries = filledEntries;
+                    }
                   })
             })
       })
@@ -166,6 +191,7 @@ export default class TimetableForm extends Vue {
   .button
     max-width: 140px
     margin-left: auto
+
     &_submit
       margin-left: .5rem
 
