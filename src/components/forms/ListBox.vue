@@ -116,7 +116,6 @@ export default class ListBox extends Vue {
 
   mounted() {
     if (this.defaultValue !== undefined) {
-      console.log(this.options);
       const defaultOption = this.getOption(this.defaultValue);
       if (defaultOption) {
         this.selectedIndex = this.defaultValue;
