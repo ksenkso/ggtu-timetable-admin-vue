@@ -15,6 +15,11 @@
 import {Component, Prop, Vue} from 'vue-property-decorator';
 import Button from "@/components/common/Button.vue";
 
+export interface ButtonGroupValue {
+  index: number;
+  value: any;
+}
+
 @Component({
   name: 'ButtonGroup',
   components: {Button}
@@ -22,7 +27,7 @@ import Button from "@/components/common/Button.vue";
 export default class ButtonGroup extends Vue {
   @Prop({required: false}) defaultIndex?: number;
   @Prop({required: true}) values!: any[];
-  selectedIndex: number = null;
+  selectedIndex: number | null = null;
 
   mounted() {
     this.selectedIndex = this.defaultIndex ?? 0;

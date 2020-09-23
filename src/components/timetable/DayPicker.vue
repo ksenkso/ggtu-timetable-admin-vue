@@ -6,7 +6,7 @@
 
 <script lang="ts">
 import {Component, Prop, Vue} from 'vue-property-decorator';
-import ButtonGroup from "@/components/common/ButtonGroup.vue";
+import ButtonGroup, {ButtonGroupValue} from "@/components/common/ButtonGroup.vue";
 
 @Component({
   name: 'DayPicker',
@@ -15,13 +15,13 @@ import ButtonGroup from "@/components/common/ButtonGroup.vue";
 export default class DayPicker extends Vue {
   @Prop({required: false}) defaultDay?: number;
   days = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
-  selectedIndex: number = null;
+  selectedIndex: number | null = null;
 
   mounted() {
     this.selectedIndex = this.defaultDay ?? 0;
   }
 
-  select({index, value}) {
+  select({index, value}: ButtonGroupValue) {
     this.selectedIndex = index;
     this.$emit('change', {index, value});
   }
