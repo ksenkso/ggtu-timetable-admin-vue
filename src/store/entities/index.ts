@@ -1,11 +1,14 @@
 import createMutations from './mutations';
 import createActions from './actions';
-import {Module} from "vuex";
+import {ActionTree, GetterTree, Module} from "vuex";
 import {EntitiesState, NamedEntityDict} from "@/store/entities/types";
 import {RootState} from "@/store/types";
 import {EntityType} from "ggtu-timetable-api-client";
-
-const createEntitiesModule = (type: EntityType): Module<EntitiesState, RootState> => ({
+export interface ModuleOverrides {
+    actions?: ActionTree<EntitiesState, RootState>;
+    getters?: GetterTree<EntitiesState, RootState>;
+}
+const createEntitiesModule = (type: EntityType, overrides: ModuleOverrides = {}): Module<EntitiesState, RootState> => ({
     namespaced: true,
     state: () => ({
         entities: {},
@@ -13,7 +16,7 @@ const createEntitiesModule = (type: EntityType): Module<EntitiesState, RootState
         filter: '',
     }),
     mutations: createMutations(),
-    actions: createActions(type),
+    actions: createActions(type, overrides.actions),
     getters: {
         filteredEntities(state): NamedEntityDict {
             return state.filter
@@ -27,7 +30,8 @@ const createEntitiesModule = (type: EntityType): Module<EntitiesState, RootState
         },
         isEmpty(state, getters): boolean {
             return !Object.keys(getters.filteredEntities).length;
-        }
+        },
+        ...overrides.getters,
     }
 });
 

@@ -7,7 +7,7 @@ import {ADD_ENTITY, REMOVE_ENTITY, SET_ALL_ENTITIES, SET_ENTITY} from "@/store/e
 import { EntityType, WithId } from 'ggtu-timetable-api-client';
 
 
-const createActions = (type: EntityType): ActionTree<EntitiesState, RootState> => {
+const createActions = (type: EntityType, overrides: ActionTree<EntitiesState, RootState> = {}): ActionTree<EntitiesState, RootState> => {
     return {
         [CREATE_ENTITY](context, entity: NamedEntity) {
             return api.getEndpoint(type).create(entity)
@@ -24,7 +24,8 @@ const createActions = (type: EntityType): ActionTree<EntitiesState, RootState> =
         [DELETE_ENTITY](context, id: number) {
             return api.getEndpoint(type).delete(id)
                 .then(() => context.commit(REMOVE_ENTITY, id));
-        }
+        },
+        ...overrides,
     }
 }
 
