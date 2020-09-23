@@ -35,8 +35,9 @@ import {SelectOption} from "@/utils/lists";
   name: 'ListBox'
 })
 export default class ListBox extends Vue {
+  @Prop() defaultValue?: number;
   @Prop({required: true}) options!: SelectOption[];
-  forceHideOptions = false;
+  forceHideOptions = true;
   displayValue = '';
   selected: SelectOption | null = null;
   selectedIndex: number | null = null;
@@ -45,6 +46,10 @@ export default class ListBox extends Vue {
     return this.displayValue
         ? this.options.filter(option => this.matches(option, this.displayValue))
         : this.options;
+  }
+
+  get showOptions() {
+    return !this.forceHideOptions && !!this.displayValue.trim();
   }
 
   onBlur() {
@@ -79,10 +84,12 @@ export default class ListBox extends Vue {
   }
 
   selectOption(index: number) {
-    this.selected = this.filteredOptions[index];
-    this.displayValue = this.selected.name;
-    this.forceHideOptions = true;
-    this.$emit('select', this.selected.value);
+    if (this.filteredOptions[index]) {
+      this.selected = this.filteredOptions[index];
+      this.displayValue = this.selected.name;
+      this.forceHideOptions = true;
+      this.$emit('select', this.selected.value);
+    }
   }
 
   matches(option: SelectOption, filter: string) {
@@ -103,8 +110,20 @@ export default class ListBox extends Vue {
     }
   }
 
-  get showOptions() {
-    return !this.forceHideOptions && !!this.displayValue.trim();
+  getOption(value: any) {
+    return this.options.find(option => option.value === value);
+  }
+
+  mounted() {
+    if (this.defaultValue !== undefined) {
+      console.log(this.options);
+      const defaultOption = this.getOption(this.defaultValue);
+      if (defaultOption) {
+        this.selectedIndex = this.defaultValue;
+        this.selected = defaultOption;
+        this.displayValue = this.selected.name;
+      }
+    }
   }
 }
 </script>
