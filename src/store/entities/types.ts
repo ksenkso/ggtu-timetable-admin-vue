@@ -1,4 +1,4 @@
-import {WithId} from "ggtu-timetable-api-client";
+import {TimetableEntryType, WithId} from "ggtu-timetable-api-client";
 
 export interface NamedEntity {
     id?: number;
@@ -11,4 +11,12 @@ export interface EntitiesState {
     ids: number[];
     entities: NamedEntityDict;
     filter: string;
+}
+
+export interface TimetableEntryForm {
+    id?: number;
+    cabinetId: number;
+    lessonId: number;
+    teacherIds: number[];
+    type: TimetableEntryType;
 }

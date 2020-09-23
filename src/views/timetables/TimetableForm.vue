@@ -1,38 +1,143 @@
 <template>
   <Page :title="title">
-    <div class="fragments" v-if="group">
-      <TimetableFormFragment :group="group"></TimetableFormFragment>
+    <WeekPicker :default-week="week" @change="setWeek"></WeekPicker>
+    <DayPicker :default-day="day" @change="setDay"></DayPicker>
+    <div class="fragments" v-if="loaded">
+      <TimetableFormFragment ref="forms" v-for="entry in entries" :key="entry.id" :entry="entry"
+                             :group="group"></TimetableFormFragment>
+    </div>
+    <div class="buttons">
+      <Button theme="primary" class="button_block" @click.native="addForm">Добавить занятие</Button>
+      <Button theme="primary" class="button_block button_submit" @click.native="submitTimetable">Сохранить</Button>
     </div>
 
   </Page>
 </template>
 
 <script lang="ts">
-import {Component, Vue} from 'vue-property-decorator';
+import {Component, Ref, Vue} from 'vue-property-decorator';
 import Page from "../Page.vue";
-import {Group, TimetableEntry} from "ggtu-timetable-api-client";
+import {
+  Cabinet,
+  Day,
+  Group,
+  TimetableEntry,
+  TimetableEntryDTO,
+  TimetableEntryType,
+  Week
+} from "ggtu-timetable-api-client";
 import {NavigationGuardNext, Route} from "vue-router";
 import {api} from "@/api";
 import TimetableFormFragment from "@/views/timetables/TimetableFormFragment.vue";
+import Button from "@/components/common/Button.vue";
+import {ButtonGroupValue} from "@/components/common/ButtonGroup.vue";
+import WeekPicker from "@/components/timetable/WeekPicker.vue";
+import DayPicker from "@/components/timetable/DayPicker.vue";
+import {namespace} from "vuex-class";
+import {NamedEntityDict} from "@/store/entities/types";
+import {Dictionary} from "vue-router/types/router";
+import {GET_ALL_ENTITIES} from "@/store/entities/action-types";
 
 Component.registerHooks([
-    'beforeRouteEnter',
-])
-
+  'beforeRouteEnter',
+]);
+const cabinets = namespace('cabinets');
+const teachers = namespace('teachers');
+const lessons = namespace('lessons');
 @Component({
   name: 'TimetableForm',
-  components: {Page, TimetableFormFragment}
+  components: {Page, TimetableFormFragment, Button, WeekPicker, DayPicker}
 })
 export default class TimetableForm extends Vue {
 
+  @cabinets.State('entities') cabinets!: Dictionary<Cabinet>;
+  @teachers.State('entities') teachers!: NamedEntityDict;
+  @lessons.State('entities') lessons!: NamedEntityDict;
+
+  @cabinets.Action(GET_ALL_ENTITIES) getCabinets!: () => Promise<void>;
+  @teachers.Action(GET_ALL_ENTITIES) getTeachers!: () => Promise<void>;
+  @lessons.Action(GET_ALL_ENTITIES) getLessons!: () => Promise<void>;
+
+  @Ref() forms!: TimetableFormFragment[];
+
   group: Group | null = null;
-  entries: TimetableEntry[] | null = null;
+  entries: (TimetableEntry | TimetableEntryDTO)[] | null = null;
+  day = 0;
+  week = 0;
+  entitiesLoaded = false;
+
   get title() {
     return this.group ? `Расписание: ${this.group.name}` : 'Загрузка...';
   }
 
   get loaded() {
-    return this.group && this.entries;
+    return this.group && this.entries && this.entitiesLoaded;
+  }
+
+  setDay(day: ButtonGroupValue) {
+    this.day = day.value;
+  }
+
+  setWeek(week: ButtonGroupValue) {
+    this.week = week.value;
+  }
+
+  addForm() {
+    if (!this.entries) {
+      this.entries = [this.createEntry()]
+    } else {
+      this.entries.push(this.createEntry());
+    }
+  }
+
+  submitTimetable() {
+    const requests = this.forms
+        .map((form, index) => ({
+          groupId: this.group!.id,
+          index, // TODO: add form mockups so that blank lessons are possible, re-index lessons
+          day: this.day,
+          week: this.week,
+          ...form.getEntry()
+        }) as TimetableEntryDTO)
+        .map(dto => {
+          return dto.id === undefined
+              ? api.timetable.create(dto)
+              : api.timetable.update(dto.id, dto)
+        });
+    Promise.all(requests)
+        .then(() => {
+          alert('SUCCESS');
+          location.reload();
+        })
+
+  }
+
+  createEntry(): any {
+    if (this.group !== null) {
+      return {
+        cabinetId: 0,
+        day: Day.Monday,
+        groupId: this.group?.id || 0,
+        index: 0,
+        lessonId: 0,
+        teacherIds: [],
+        type: TimetableEntryType.Lecture,
+        week: Week.Top
+      }
+    }
+
+  }
+
+  mounted() {
+
+    Promise.all([
+      this.getCabinets(),
+      this.getLessons(),
+      this.getTeachers()
+    ])
+        .then(() => {
+          this.entitiesLoaded = true;
+        })
   }
 
   beforeRouteEnter(to: Route, from: Route, next: NavigationGuardNext) {
@@ -41,19 +146,27 @@ export default class TimetableForm extends Vue {
     } else {
       next((vm: Vue) => {
         api.groups.get(+to.params.groupId)
-          .then(group => {
-            (vm as TimetableForm).group = group;
-            api.timetable.getForGroup(group.id)
-              .then(entries => {
-                (vm as TimetableForm).entries = entries;
-              })
-          })
+            .then(group => {
+              (vm as TimetableForm).group = group;
+              api.timetable.getForGroup(group.id)
+                  .then(entries => {
+                    (vm as TimetableForm).entries = entries;
+                  })
+            })
       })
     }
   }
 }
 </script>
 
-<style scoped>
+<style scoped lang="sass">
+.buttons
+  display: flex
+
+  .button
+    max-width: 140px
+    margin-left: auto
+    &_submit
+      margin-left: .5rem
 
 </style>
