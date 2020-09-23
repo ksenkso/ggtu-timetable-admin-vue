@@ -11,5 +11,5 @@ export const defaultEntityAdapter = (list: NamedEntity[]): SelectOption[] => {
 }
 
 export const cabinetsAdapter = (cabinets: Cabinet[]) => {
-    return cabinets.map(cabinet => ({value: cabinet.id, name: cabinet.building?.name + ' ' + cabinet.name}));
+    return cabinets.map(cabinet => ({value: cabinet.id, name: cabinet.building!.name + ' ' + cabinet.name}));
 }
