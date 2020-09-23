@@ -5,48 +5,49 @@
     </div>
     <div class="form__buttons">
       <slot name="submit" :disabled="isLoading">
-        <Button type="submit" theme="primary" :disabled="isLoading">{{ sendButtonText }}</Button>
+        <Button v-if="!noSubmitButton" type="submit" theme="primary" :disabled="isLoading">{{ sendButtonText }}</Button>
       </slot>
     </div>
   </form>
 </template>
 
-<script>
+<script lang="ts">
 import Button from '@/components/common/Button.vue';
 
-export default {
+import {Component, Prop, Vue} from 'vue-property-decorator';
+
+@Component({
   name: 'Form',
   components: {Button},
-  props: {
-    sendButtonText: {
-      type: String,
-      default: 'Отправить'
-    },
-    isLoading: {
-      type: Boolean,
-      default: false
-    }
-  },
-  methods: {
-    onSubmit() {
-      const data = {};
-      this.$slots.default?.forEach(node => {
-        const name = node.componentInstance.$options.name
-        if (name === 'Field') {
-          // if a form already has value with the name of this field,
-          // make an array that will contain all values for this name in order
-          // that they appear in the DOM
-          if (data[node.componentInstance?.$props.name]) {
-            data[node.componentInstance?.$props.name] = [data[node.componentInstance?.$props.name], node.componentInstance?.$data.value];
-          } else {
-            data[node.componentInstance?.$props.name] = node.componentInstance?.$data.value;
-          }
+})
+export default class Form extends Vue {
+  @Prop({default: 'Отправить'}) sendButtonText!: string;
+  @Prop({default: false}) isLoading!: boolean;
+  @Prop({type: Boolean}) noSubmitButton?: boolean;
+
+  onSubmit() {
+    this.$emit('submit', this.getFormData());
+  }
+
+  getFormData(): any {
+    const data: any = {};
+    this.$slots.default!.forEach(node => {
+      const name = node.componentInstance!.$options.name
+      if (name === 'Field') {
+        // if a form already has value with the name of this field,
+        // make an array that will contain all values for this name in order
+        // that they appear in the DOM
+        if (data[node.componentInstance!.$props.name]) {
+          data[node.componentInstance?.$props.name] = [data[node.componentInstance?.$props.name], node.componentInstance?.$data.value];
+        } else {
+          data[node.componentInstance?.$props.name] = node.componentInstance?.$data.value;
         }
-      });
-      this.$emit('submit', data);
-    }
+      }
+    });
+    return data;
   }
 }
+
 </script>
 
 <style scoped lang="sass">
