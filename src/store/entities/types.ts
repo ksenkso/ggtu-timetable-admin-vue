@@ -5,7 +5,7 @@ export interface NamedEntity {
     name: string;
 }
 
-export type NamedEntityDict = Record<number, WithId<NamedEntity>>//{ [key: number]: WithId<NamedEntity> };
+export type NamedEntityDict = Record<number | string, WithId<NamedEntity>>//{ [key: number]: WithId<NamedEntity> };
 
 export interface EntitiesState {
     ids: number[];
