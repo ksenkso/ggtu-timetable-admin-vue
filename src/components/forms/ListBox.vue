@@ -7,8 +7,8 @@
     >
       <div class="list-box__option list-box__option_empty" v-show="!filteredOptions.length">Нет опций</div>
       <div
-          v-for="(option, index) in filteredOptions"
-          :data-index="index"
+          v-for="option in filteredOptions"
+          :data-value="option.value"
           :key="option.value"
           :class="`list-box__option${selected && selected.value === option.value ? ' list-box__option_selected' : ''}`">
         {{ option.name }}
@@ -57,9 +57,9 @@ export default class ListBox extends Vue {
   }
 
   onKeyboardSelect(e: KeyboardEvent) {
-    if (this.selectedIndex !== null) {
+    if (this.selected !== null) {
       e.preventDefault();
-      this.selectOption(this.selectedIndex);
+      this.selectOption(this.selected.value);
     }
   }
 
@@ -78,14 +78,15 @@ export default class ListBox extends Vue {
   onOptionClick(e: MouseEvent) {
     const target = e.target as HTMLElement;
     // typescript will scream if i will not check for undefined
-    if (target.dataset.index !== undefined) {
-      this.selectOption(+target.dataset.index);
+    if (target.dataset.value !== undefined) {
+      this.selectOption(+target.dataset.value);
     }
   }
 
-  selectOption(index: number) {
-    if (this.filteredOptions[index]) {
-      this.selected = this.filteredOptions[index];
+  selectOption(value: number) {
+    const option = this.getOption(value);
+    if (option) {
+      this.selected = option;
       this.displayValue = this.selected.name;
       this.forceHideOptions = true;
       this.$emit('select', this.selected.value);
@@ -116,12 +117,7 @@ export default class ListBox extends Vue {
 
   mounted() {
     if (this.defaultValue !== undefined) {
-      const defaultOption = this.getOption(this.defaultValue);
-      if (defaultOption) {
-        this.selectedIndex = this.defaultValue;
-        this.selected = defaultOption;
-        this.displayValue = this.selected.name;
-      }
+      this.selectOption(this.defaultValue);
     }
   }
 }
