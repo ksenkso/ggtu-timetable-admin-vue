@@ -1,8 +1,6 @@
 <template>
   <div class="timetable-form__fragment" v-if="data">
-    <div class="mock-lesson">
-      <Button @click.native="addEntry">Добавить</Button>
-    </div>
+    <Button theme="danger" @click.native="$emit('remove')">Убрать пару</Button>
     <Form ref="form" no-submit-button>
       <Field name="lessonId" label="Предмет">
         <template v-slot:input="{updateValue}">
@@ -61,7 +59,7 @@ const lessons = namespace('lessons');
 export default class TimetableFormFragment extends Vue {
 
   @Prop({required: true}) entry!: TimetableEntry | TimetableEntryDTO | null;
-
+  @Prop({required: true}) index!: number;
   @cabinets.State('entities') cabinets!: Dictionary<Cabinet>;
   @teachers.State('entities') teachers!: NamedEntityDict;
   @lessons.State('entities') lessons!: NamedEntityDict;
@@ -94,6 +92,7 @@ export default class TimetableFormFragment extends Vue {
       lessonId: data.lessonId,
       teacherIds: Array.isArray(data.teacherIds) ? data.teacherIds : [data.teacherIds],
       type: data.type,
+      index: this.index,
     };
   }
 

@@ -19,4 +19,5 @@ export interface TimetableEntryForm {
     lessonId: number;
     teacherIds: number[];
     type: TimetableEntryType;
+     index: number;
 }

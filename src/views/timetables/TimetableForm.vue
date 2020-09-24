@@ -5,7 +5,14 @@
     <div class="fragments" v-if="loaded">
       <div class="lesson" v-for="(entry, index) in entries" :key="index">
         <h3>Пара {{ index + 1 }}</h3>
-        <component :is="componentForEntry(entry)" ref="forms" :entry="entry"></component>
+        <component
+            ref="forms"
+            :is="componentForEntry(entry)"
+            :entry="entry"
+            :index="index"
+            @remove="removeLesson(index)"
+            @set="setLesson(index)"
+        ></component>
       </div>
     </div>
     <div class="buttons">
@@ -26,12 +33,12 @@ import {
   TimetableEntry,
   TimetableEntryDTO,
   TimetableEntryType,
-  Week, WithId
+  Week,
+  WithId
 } from "ggtu-timetable-api-client";
 import {NavigationGuardNext, Route} from "vue-router";
 import {api} from "@/api";
 import TimetableFormFragment from "@/views/timetables/TimetableFormFragment.vue";
-import Button from "@/components/common/Button.vue";
 import {ButtonGroupValue} from "@/components/common/ButtonGroup.vue";
 import WeekPicker from "@/components/timetable/WeekPicker.vue";
 import DayPicker from "@/components/timetable/DayPicker.vue";
@@ -49,7 +56,7 @@ const teachers = namespace('teachers');
 const lessons = namespace('lessons');
 @Component({
   name: 'TimetableForm',
-  components: {Page, TimetableFormFragment, Button, WeekPicker, DayPicker, MockLesson}
+  components: {Page, TimetableFormFragment, WeekPicker, DayPicker, MockLesson}
 })
 export default class TimetableForm extends Vue {
 
@@ -61,7 +68,7 @@ export default class TimetableForm extends Vue {
   @teachers.Action(GET_ALL_ENTITIES) getTeachers!: () => Promise<void>;
   @lessons.Action(GET_ALL_ENTITIES) getLessons!: () => Promise<void>;
 
-  @Ref() forms!: TimetableFormFragment[];
+  @Ref() forms!: (TimetableFormFragment | MockLesson)[];
 
   group: WithId<Group> | null = null;
   entries: (TimetableEntry | TimetableEntryDTO | null)[] | null = null;
@@ -75,6 +82,18 @@ export default class TimetableForm extends Vue {
 
   get loaded() {
     return this.group && this.entries && this.entitiesLoaded;
+  }
+
+  removeLesson(index: number) {
+    if (this.entries) {
+      Vue.set(this.entries, index, null);
+    }
+  }
+
+  setLesson(index: number) {
+    if (this.entries) {
+      Vue.set(this.entries, index, this.createEntry());
+    }
   }
 
   componentForEntry(entry: TimetableEntry | TimetableEntryDTO | null): string {
@@ -98,14 +117,17 @@ export default class TimetableForm extends Vue {
   }
 
   submitTimetable() {
-    const requests = this.forms
-        .map((form, index) => ({
-          groupId: this.group && this.group.id,
-          index, // TODO: add form mockups so that blank lessons are possible, re-index lessons
-          day: this.day,
-          week: this.week,
-          ...form.getEntry()
-        }) as TimetableEntryDTO)
+    const forms = this.forms
+        .filter(form => form.$options.name === 'TimetableFormFragment') as TimetableFormFragment[];
+    const requests = forms
+        .map(form => {
+          return ({
+            groupId: this.group && this.group.id,
+            day: this.day,
+            week: this.week,
+            ...form.getEntry()
+          }) as TimetableEntryDTO;
+        })
         .map(dto => {
           return dto.id === undefined
               ? api.timetable.create(dto)
@@ -165,6 +187,8 @@ export default class TimetableForm extends Vue {
                     } else {
                       const filledEntries = [];
                       let i = 0, j = 0;
+                      // sort entries by index or it will go forever
+                      entries.sort((a, b) => a.index - b.index);
                       while (j < entries.length) {
                         if (entries[j].index !== i) {
                           filledEntries.push(null);
