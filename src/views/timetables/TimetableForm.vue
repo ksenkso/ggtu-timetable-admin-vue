@@ -75,6 +75,7 @@ export default class TimetableForm extends Vue {
   day = 0;
   week = 0;
   entitiesLoaded = false;
+  loadedEntries: TimetableEntry[] = [];
 
   get title() {
     return this.group ? `Расписание: ${this.group.name}` : 'Загрузка...';
@@ -119,7 +120,8 @@ export default class TimetableForm extends Vue {
   submitTimetable() {
     const forms = this.forms
         .filter(form => form.$options.name === 'TimetableFormFragment') as TimetableFormFragment[];
-    const requests = forms
+
+    const requests: Promise<any>[] = forms
         .map(form => {
           return ({
             groupId: this.group && this.group.id,
@@ -133,11 +135,20 @@ export default class TimetableForm extends Vue {
               ? api.timetable.create(dto)
               : api.timetable.update(dto.id, dto)
         });
-    Promise.all(requests)
+    // check if any lessons were deleted
+    const lessonsToRemove = this.loadedEntries.reduce<number[]>((toRemove, loaded) => {
+      if (!this.entries?.find(entry => entry && entry.id === loaded.id)) {
+        toRemove.push(loaded.id as number);
+      }
+      return toRemove;
+    }, [])
+        .map(id => api.timetable.delete(id));
+
+    Promise.all(requests.concat(lessonsToRemove))
         .then(() => {
           alert('SUCCESS');
           location.reload();
-        })
+        });
 
   }
 
@@ -199,6 +210,7 @@ export default class TimetableForm extends Vue {
                         i++;
                       }
                       $this.entries = filledEntries;
+                      $this.loadedEntries = entries;
                     }
                   })
             })
