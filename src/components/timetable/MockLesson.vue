@@ -1,7 +1,7 @@
 <template>
   <div class="mock-lesson">
     <Alert theme="warning">
-      No lesson here
+      Пары нет
       <Button @click.native="$emit('set')" theme="warning">Поставить пару</Button>
     </Alert>
   </div>
