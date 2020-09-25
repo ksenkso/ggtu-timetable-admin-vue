@@ -1,6 +1,6 @@
 <template>
   <div class="timetable-form__fragment" v-if="data">
-    <Button theme="danger" @click.native="$emit('remove')">Убрать пару</Button>
+    <Button theme="danger" @click.native="$emit('remove', index)">Убрать пару</Button>
     <Form ref="form" no-submit-button>
       <Field name="lessonId" label="Предмет">
         <template v-slot:input="{updateValue}">
@@ -47,6 +47,7 @@ import WeekPicker from "@/components/timetable/WeekPicker.vue";
 import {NamedEntity, NamedEntityDict, TimetableEntryForm} from "@/store/entities/types";
 import {namespace} from "vuex-class";
 import {Dictionary} from "vue-router/types/router";
+import {TimetableEntryView} from "@/utils/timetables";
 
 const cabinets = namespace('cabinets');
 const teachers = namespace('teachers');
@@ -56,9 +57,9 @@ const lessons = namespace('lessons');
   name: 'TimetableFormFragment',
   components: {Form, Field, Select, ListBox, DayPicker, WeekPicker, Button}
 })
-export default class TimetableFormFragment extends Vue {
+export default class TimetableFormFragment extends Vue implements TimetableEntryView {
 
-  @Prop({required: true}) entry!: TimetableEntry | TimetableEntryDTO | null;
+  @Prop({required: true}) entry!: TimetableEntry | TimetableEntryDTO;
   @Prop({required: true}) index!: number;
   @cabinets.State('entities') cabinets!: Dictionary<Cabinet>;
   @teachers.State('entities') teachers!: NamedEntityDict;
@@ -81,13 +82,10 @@ export default class TimetableFormFragment extends Vue {
     this.teachersCount++;
   }
 
-  getEntry(): TimetableEntryForm | null {
-    if (this.entry === null) {
-      return null;
-    }
+  getTimetableEntry(): TimetableEntryForm {
     const data = this.form.getFormData();
     return {
-      id: this.entry.id,
+      id: this.entry.id as number,
       cabinetId: data.cabinetId,
       lessonId: data.lessonId,
       teacherIds: Array.isArray(data.teacherIds) ? data.teacherIds : [data.teacherIds],
@@ -97,16 +95,14 @@ export default class TimetableFormFragment extends Vue {
   }
 
   mounted() {
-    if (this.entry !== null) {
-      this.data = this.createEntryDto(this.entry);
-      this.teachersCount = Math.max(this.data.teacherIds.length, 1);
-      this.lessonsOptions = defaultEntityAdapter(Object.keys(this.lessons)
-          .map((id) => this.lessons[id] as NamedEntity));
-      this.teachersOptions = defaultEntityAdapter(Object.keys(this.teachers)
-          .map((id) => this.teachers[id] as NamedEntity));
-      this.cabinetsOptions = cabinetsAdapter(Object.keys(this.cabinets)
-          .map((id) => this.cabinets[id] as Cabinet));
-    }
+    this.data = this.createEntryDto(this.entry);
+    this.teachersCount = Math.max(this.data.teacherIds.length, 1);
+    this.lessonsOptions = defaultEntityAdapter(Object.keys(this.lessons)
+        .map((id) => this.lessons[id] as NamedEntity));
+    this.teachersOptions = defaultEntityAdapter(Object.keys(this.teachers)
+        .map((id) => this.teachers[id] as NamedEntity));
+    this.cabinetsOptions = cabinetsAdapter(Object.keys(this.cabinets)
+        .map((id) => this.cabinets[id] as Cabinet));
   }
 
   private createEntryDto(entry: TimetableEntry | TimetableEntryDTO): TimetableEntryDTO {

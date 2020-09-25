@@ -13,11 +13,17 @@ export interface EntitiesState {
     filter: string;
 }
 
+export interface TimetableFormEmpty {
+    id: number;
+    type: TimetableEntryType;
+    index: number;
+}
+
 export interface TimetableEntryForm {
-    id?: number;
+    id: number;
     cabinetId: number;
     lessonId: number;
     teacherIds: number[];
     type: TimetableEntryType;
-     index: number;
+    index: number;
 }
