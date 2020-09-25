@@ -11,7 +11,12 @@
         :entities="filteredEntities"
         editRoute="/groups"
         :deleteCallback="deleteCallback"
-    ></EntityList>
+    >
+      <template v-slot:item="{entity}">
+        <router-link class="entity-list__link" :to="`/groups/${entity.id}`">{{ entity.name }}</router-link>
+        <router-link class="button" :to="`timetable/${entity.id}/edit`">Расписание</router-link>
+      </template>
+    </EntityList>
   </Page>
 </template>
 
