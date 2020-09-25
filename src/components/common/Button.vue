@@ -40,6 +40,8 @@ export default {
   cursor: pointer
   transition: filter .1s ease-in-out
   text-decoration: none
+  line-height: 1.6
+
   &[disabled]
     filter: grayscale(70%)
     color: theme-color("light")
