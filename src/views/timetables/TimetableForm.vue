@@ -3,7 +3,7 @@
     <WeekPicker :default-week="week" @change="setWeek"></WeekPicker>
     <DayPicker :default-day="day" @change="setDay"></DayPicker>
     <div class="fragments" v-if="loaded">
-      <div class="lesson" v-for="(entry, index) in entries" :key="index">
+      <div class="lesson" v-for="(entry, index) in currentDay" :key="index">
         <h3>Пара {{ index + 1 }}</h3>
         <component
             ref="forms"
@@ -71,30 +71,28 @@ export default class TimetableForm extends Vue {
   @Ref() forms!: (TimetableFormFragment | MockLesson)[];
 
   group: WithId<Group> | null = null;
-  entries: (TimetableEntry | TimetableEntryDTO | null)[] | null = null;
   day = 0;
   week = 0;
   entitiesLoaded = false;
-  loadedEntries: TimetableEntry[] = [];
+  timetable: (TimetableEntry | TimetableEntryDTO | null)[][][] = [];
+  currentDay: (TimetableEntry | TimetableEntryDTO | null)[] = [];
+  loadedTimetable: Array<readonly (TimetableEntry | TimetableEntryDTO)[][]> = [];
+  loading = false;
 
   get title() {
     return this.group ? `Расписание: ${this.group.name}` : 'Загрузка...';
   }
 
   get loaded() {
-    return this.group && this.entries && this.entitiesLoaded;
+    return this.group && !this.loading && this.entitiesLoaded;
   }
 
   removeLesson(index: number) {
-    if (this.entries) {
-      Vue.set(this.entries, index, null);
-    }
+    Vue.set(this.currentDay, index, null);
   }
 
   setLesson(index: number) {
-    if (this.entries) {
-      Vue.set(this.entries, index, this.createEntry());
-    }
+    Vue.set(this.currentDay, index, this.createEntry());
   }
 
   componentForEntry(entry: TimetableEntry | TimetableEntryDTO | null): string {
@@ -102,19 +100,18 @@ export default class TimetableForm extends Vue {
   }
 
   setDay(day: ButtonGroupValue) {
-    this.day = day.value;
+    this.day = day.index;
+    this.updateCurrentDay()
   }
 
   setWeek(week: ButtonGroupValue) {
-    this.week = week.value;
+    this.week = week.index;
+    this.loadEntries()
+        .then(() => this.updateCurrentDay());
   }
 
   addForm() {
-    if (!this.entries) {
-      this.entries = [this.createEntry()]
-    } else {
-      this.entries.push(this.createEntry());
-    }
+    this.timetable[this.week][this.day].push(this.createEntry());
   }
 
   submitTimetable() {
@@ -136,14 +133,14 @@ export default class TimetableForm extends Vue {
               : api.timetable.update(dto.id, dto)
         });
     // check if any lessons were deleted
-    const lessonsToRemove = this.loadedEntries.reduce<number[]>((toRemove, loaded) => {
-      if (!this.entries?.find(entry => entry && entry.id === loaded.id)) {
-        toRemove.push(loaded.id as number);
-      }
-      return toRemove;
-    }, [])
+    const lessonsToRemove = this.loadedTimetable[this.week][this.day]
+        .reduce<number[]>((toRemove, loaded) => {
+          if (!this.currentDay.find(entry => entry && entry.id === loaded.id)) {
+            toRemove.push(loaded.id as number);
+          }
+          return toRemove;
+        }, [])
         .map(id => api.timetable.delete(id));
-
     Promise.all(requests.concat(lessonsToRemove))
         .then(() => {
           alert('SUCCESS');
@@ -169,7 +166,6 @@ export default class TimetableForm extends Vue {
   }
 
   mounted() {
-
     Promise.all([
       this.getCabinets(),
       this.getLessons(),
@@ -177,6 +173,60 @@ export default class TimetableForm extends Vue {
     ])
         .then(() => {
           this.entitiesLoaded = true;
+        })
+  }
+
+  loadEntries(): Promise<any> {
+    this.loading = true;
+    if (!this.group) return Promise.resolve();
+    return api.timetable.getForGroupByWeek(this.group.id, this.week)
+        .then(entries => {
+          if (!entries.length) {
+            this.timetable = [
+              [
+                [], [], [], [], [], [],
+              ],
+              [
+                [], [], [], [], [], [],
+              ],
+            ];
+          } else {
+            const days: TimetableEntry[][] = [
+              [],
+              [],
+              [],
+              [],
+              [],
+              [],
+            ];
+            entries.reduce((days, entry) => {
+              days[entry.day].push(entry);
+              return days;
+            }, days);
+            const timetable = days.map(day => {
+              day.sort((a, b) => a.index - b.index);
+              /**
+               * Go through entries array and fill in null values if indices do not match.
+               */
+              const filledEntries = [];
+              let lessonIndex = 0, entryIndex = 0;
+              while (entryIndex < day.length) {
+                // this entry is not in its place, so there should be null
+                if (day[entryIndex].index !== lessonIndex) {
+                  filledEntries.push(null);
+                } else {
+                  filledEntries.push(day[entryIndex]);
+                  entryIndex++;
+                }
+                lessonIndex++;
+              }
+              return filledEntries as (TimetableEntry | null)[];
+            });
+            this.loadedTimetable[this.week] = days;
+            this.timetable[this.week] = timetable;
+            this.updateCurrentDay();
+            this.loading = false;
+          }
         })
   }
 
@@ -189,33 +239,14 @@ export default class TimetableForm extends Vue {
         api.groups.get(+to.params.groupId)
             .then(group => {
               $this.group = group;
-              api.timetable.getForGroup(group.id)
-                  .then(entries => {
-                    if (!entries.length) {
-                      $this.entries = [
-                        $this.createEntry(),
-                      ];
-                    } else {
-                      const filledEntries = [];
-                      let i = 0, j = 0;
-                      // sort entries by index or it will go forever
-                      entries.sort((a, b) => a.index - b.index);
-                      while (j < entries.length) {
-                        if (entries[j].index !== i) {
-                          filledEntries.push(null);
-                        } else {
-                          filledEntries.push(entries[j]);
-                          j++;
-                        }
-                        i++;
-                      }
-                      $this.entries = filledEntries;
-                      $this.loadedEntries = entries;
-                    }
-                  })
+              return $this.loadEntries()
             })
       })
     }
+  }
+
+  private updateCurrentDay() {
+    this.currentDay = this.timetable[this.week][this.day];
   }
 }
 </script>
