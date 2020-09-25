@@ -55,12 +55,10 @@ export default class EntityList extends Vue {
     display: flex
     align-items: baseline
     align-content: baseline
-
+    .button + .button
+      margin-left: .5rem
     &:hover
       background-color: #eee
-
-    .button
-      margin-left: auto
 
     &:last-child
       border-bottom: none
