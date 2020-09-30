@@ -1,16 +1,17 @@
-import {TimetableEntryType, WithId} from "ggtu-timetable-api-client";
+import { TimetableEntryType, WithId } from 'ggtu-timetable-api-client';
 
 export interface NamedEntity {
     id?: number;
     name: string;
 }
 
-export type NamedEntityDict = Record<number | string, WithId<NamedEntity>>//{ [key: number]: WithId<NamedEntity> };
+export type NamedEntityDict = Record<number | string, WithId<NamedEntity>>;
 
 export interface EntitiesState {
     ids: number[];
     entities: NamedEntityDict;
     filter: string;
+    isLoaded: boolean;
 }
 
 export interface TimetableFormEmpty {
@@ -27,6 +28,7 @@ export interface TimetableEntryForm {
     type: TimetableEntryType;
     index: number;
 }
- export interface TimetablePatchForm extends TimetableEntryForm {
-     dates: string[];
- }
+
+export interface TimetablePatchForm extends TimetableEntryForm {
+    dates: string[];
+}

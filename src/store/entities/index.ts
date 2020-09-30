@@ -14,6 +14,7 @@ const createEntitiesModule = (type: EntityType, overrides: ModuleOverrides = {})
         entities: {},
         ids: [],
         filter: '',
+        isLoaded: false,
     }),
     mutations: createMutations(),
     actions: createActions(type, overrides.actions),

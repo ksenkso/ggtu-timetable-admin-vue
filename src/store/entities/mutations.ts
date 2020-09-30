@@ -3,6 +3,7 @@ import {MutationTree} from "vuex";
 import {WithId} from 'ggtu-timetable-api-client/dist/interfaces';
 import {ADD_ENTITY, REMOVE_ENTITY, SET_ALL_ENTITIES, SET_ENTITY, SET_FILTER} from "@/store/entities/mutations-types";
 import Vue from "vue";
+import { SET_LOADED } from '@/store/entities/mutations-types';
 
 const createMutations = (): MutationTree<EntitiesState> => {
     return {
@@ -26,6 +27,9 @@ const createMutations = (): MutationTree<EntitiesState> => {
         },
         [SET_FILTER](state, filter) {
             state.filter = filter;
+        },
+        [SET_LOADED](state, isLoaded) {
+            state.isLoaded = isLoaded;
         }
     }
 }
