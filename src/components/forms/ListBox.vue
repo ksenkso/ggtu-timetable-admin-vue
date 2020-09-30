@@ -30,6 +30,7 @@
 <script lang="ts">
 import {Component, Prop, Vue} from 'vue-property-decorator';
 import {SelectOption} from "@/utils/lists";
+import { Watch } from 'vue-property-decorator';
 
 @Component({
   name: 'ListBox'
@@ -118,6 +119,14 @@ export default class ListBox extends Vue {
   mounted() {
     if (this.defaultValue !== undefined) {
       this.selectOption(this.defaultValue);
+    }
+  }
+
+  @Watch('options')
+  updateDisplayValue() {
+    const selectedValue = this.selected ? this.selected.value : this.defaultValue;
+    if (selectedValue !== undefined) {
+      this.selectOption(selectedValue);
     }
   }
 }
