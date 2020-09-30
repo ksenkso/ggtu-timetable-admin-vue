@@ -32,6 +32,9 @@ export default class Alert extends Vue {
   border: 1px solid #ddd
   border-radius: 3px
   margin: 1em 0
+  display: flex
+  align-items: center
+
   &_theme
     @each $mod, $color in $colors
       &-#{$mod}
@@ -40,6 +43,7 @@ export default class Alert extends Vue {
         border-color: rgba($color, 0.3)
         @if ($mod == "light")
           border: 1px solid theme-color("gray")
+
   &__title
     margin-top: 0
     margin-bottom: .75em
