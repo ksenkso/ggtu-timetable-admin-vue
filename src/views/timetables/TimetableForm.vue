@@ -36,18 +36,19 @@ import {
   TimetableEntryType,
   Week,
   WithId
-} from "ggtu-timetable-api-client";
-import {NavigationGuardNext, Route} from "vue-router";
-import {api} from "@/api";
-import TimetableFormFragment from "@/views/timetables/TimetableFormFragment.vue";
-import {ButtonGroupValue} from "@/components/common/ButtonGroup.vue";
-import WeekPicker from "@/components/timetable/WeekPicker.vue";
-import DayPicker from "@/components/timetable/DayPicker.vue";
-import {namespace} from "vuex-class";
-import {NamedEntityDict} from "@/store/entities/types";
-import {Dictionary} from "vue-router/types/router";
-import {GET_ALL_ENTITIES} from "@/store/entities/action-types";
-import MockLesson from "@/components/timetable/MockLesson.vue";
+} from 'ggtu-timetable-api-client';
+import { NavigationGuardNext, Route } from 'vue-router';
+import { api } from '@/api';
+import RegularEntryForm from '@/views/timetables/RegularEntryForm.vue';
+import { ButtonGroupValue } from '@/components/common/ButtonGroup.vue';
+import WeekPicker from '@/components/timetable/WeekPicker.vue';
+import DayPicker from '@/components/timetable/DayPicker.vue';
+import { namespace } from 'vuex-class';
+import { NamedEntityDict } from '@/store/entities/types';
+import { Dictionary } from 'vue-router/types/router';
+import { GET_ALL_ENTITIES } from '@/store/entities/action-types';
+import MockLesson from '@/components/timetable/MockLesson.vue';
+import { TimetableEntryHolder } from '@/utils/timetables';
 
 Component.registerHooks([
   'beforeRouteEnter',
@@ -61,7 +62,7 @@ let loadedTimetable: (TimetableEntry | TimetableEntryDTO)[][][] = [
 ];
 @Component({
   name: 'TimetableForm',
-  components: {Page, TimetableFormFragment, WeekPicker, DayPicker, MockLesson}
+  components: { Page, RegularEntryForm, WeekPicker, DayPicker, MockLesson }
 })
 export default class TimetableForm extends Vue {
 
@@ -73,7 +74,7 @@ export default class TimetableForm extends Vue {
   @teachers.Action(GET_ALL_ENTITIES) getTeachers!: () => Promise<void>;
   @lessons.Action(GET_ALL_ENTITIES) getLessons!: () => Promise<void>;
 
-  @Ref() forms!: (TimetableFormFragment | MockLesson)[];
+  @Ref() forms!: (RegularEntryForm | MockLesson)[];
 
   group: WithId<Group> | null = null;
   day = 0;
@@ -110,7 +111,7 @@ export default class TimetableForm extends Vue {
   }
 
   componentForEntry(entry: TimetableEntry | TimetableEntryDTO): string {
-    return entry.type === TimetableEntryType.Empty ? 'MockLesson' : 'TimetableFormFragment';
+    return entry.type === TimetableEntryType.Empty ? 'MockLesson' : 'RegularEntryForm';
   }
 
   setDay(day: ButtonGroupValue) {
@@ -130,7 +131,7 @@ export default class TimetableForm extends Vue {
 
   submitTimetable() {
     const requests: Promise<any>[] = this.forms
-        .map(form => {
+        .map((form: TimetableEntryHolder<any>) => {
           return ({
             groupId: this.group && this.group.id,
             day: this.day,

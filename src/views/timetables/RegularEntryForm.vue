@@ -29,41 +29,52 @@
           <ListBox :default-value="data.cabinetId" @select="updateValue" :options="cabinetsOptions"></ListBox>
         </template>
       </Field>
+      <slot></slot>
     </Form>
   </div>
 </template>
 
 <script lang="ts">
-import {Component, Prop, Ref, Vue} from 'vue-property-decorator';
-import {Cabinet, TimetableEntry, TimetableEntryDTO} from "ggtu-timetable-api-client";
-import Form from "../../components/forms/Form.vue";
-import Field from "../../components/forms/Field.vue";
-import Select from "../../components/forms/Select.vue";
-import ListBox from "@/components/forms/ListBox.vue";
-import {cabinetsAdapter, defaultEntityAdapter, SelectOption} from "@/utils/lists";
-import DayPicker from "@/components/timetable/DayPicker.vue";
-import Button from "@/components/common/Button.vue";
-import WeekPicker from "@/components/timetable/WeekPicker.vue";
-import {NamedEntity, NamedEntityDict, TimetableEntryForm} from "@/store/entities/types";
-import {namespace} from "vuex-class";
-import {Dictionary} from "vue-router/types/router";
-import {TimetableEntryView} from "@/utils/timetables";
+import { Component } from 'vue-property-decorator';
+import { TimetableEntry, TimetableEntryDTO } from 'ggtu-timetable-api-client';
+import Form from '../../components/forms/Form.vue';
+import Field from '../../components/forms/Field.vue';
+import Select from '../../components/forms/Select.vue';
+import ListBox from '@/components/forms/ListBox.vue';
+import DayPicker from '@/components/timetable/DayPicker.vue';
+import Button from '@/components/common/Button.vue';
+import WeekPicker from '@/components/timetable/WeekPicker.vue';
+import { TimetableEntryForm } from '@/store/entities/types';
+import { TimetableEntryHolder } from '@/utils/timetables';
+import TimetableFormFragment from '@/mixins/TimetableFormFragment';
 
+/*
 const cabinets = namespace('cabinets');
 const teachers = namespace('teachers');
 const lessons = namespace('lessons');
+*/
 
 @Component({
-  name: 'TimetableFormFragment',
-  components: {Form, Field, Select, ListBox, DayPicker, WeekPicker, Button}
+  name: 'RegularEntryForm',
+  components: { Form, Field, Select, ListBox, DayPicker, WeekPicker, Button }
 })
-export default class TimetableFormFragment extends Vue implements TimetableEntryView {
+export default class RegularEntryForm extends TimetableFormFragment<TimetableEntry, TimetableEntryDTO> implements TimetableEntryHolder<TimetableEntryForm> {
 
-  @Prop({required: true}) entry!: TimetableEntry | TimetableEntryDTO;
-  @Prop({required: true}) index!: number;
+  /*@Prop({ required: true }) entry!: TimetableEntry | TimetableEntryDTO;
+  @Prop({ required: true }) index!: number;
+  @cabinets.Action(GET_ALL_ENTITIES) getCabinets!: () => Promise<void>;
+  @teachers.Action(GET_ALL_ENTITIES) getTeachers!: () => Promise<void>;
+  @lessons.Action(GET_ALL_ENTITIES) getLessons!: () => Promise<void>;
   @cabinets.State('entities') cabinets!: Dictionary<Cabinet>;
   @teachers.State('entities') teachers!: NamedEntityDict;
   @lessons.State('entities') lessons!: NamedEntityDict;
+  @cabinets.State('isLoaded') cabinetsLoaded!: boolean;
+  @teachers.State('isLoaded') teachersLoaded!: boolean;
+  @lessons.State('isLoaded') lessonsLoaded!: boolean;
+
+  get optionsLoaded(): boolean {
+    return this.cabinetsLoaded && this.teachersLoaded && this.lessonsLoaded;
+  }
 
   @Ref() form!: Form;
   data: TimetableEntryDTO | null = null;
@@ -71,16 +82,16 @@ export default class TimetableFormFragment extends Vue implements TimetableEntry
   teachersOptions: SelectOption[] = [];
   cabinetsOptions: SelectOption[] = [];
   entryTypes: SelectOption[] = [
-    {value: 0, name: 'Лекция'},
-    {value: 1, name: 'Практическое занятие'},
-    {value: 2, name: 'Лабораторная работа'},
+    { value: 0, name: 'Лекция' },
+    { value: 1, name: 'Практическое занятие' },
+    { value: 2, name: 'Лабораторная работа' },
   ];
   teachersCount = 1;
   private teacherIds?: number[] | null = null;
 
   addTeacherField() {
     this.teachersCount++;
-  }
+  }*/
 
   getTimetableEntry(): TimetableEntryForm {
     const data = this.form.getFormData();
@@ -94,18 +105,31 @@ export default class TimetableFormFragment extends Vue implements TimetableEntry
     };
   }
 
-  mounted() {
+  /*mounted() {
     this.data = this.createEntryDto(this.entry);
     this.teachersCount = Math.max(this.data.teacherIds.length, 1);
-    this.lessonsOptions = defaultEntityAdapter(Object.keys(this.lessons)
-        .map((id) => this.lessons[id] as NamedEntity));
-    this.teachersOptions = defaultEntityAdapter(Object.keys(this.teachers)
-        .map((id) => this.teachers[id] as NamedEntity));
-    this.cabinetsOptions = cabinetsAdapter(Object.keys(this.cabinets)
-        .map((id) => this.cabinets[id] as Cabinet));
-  }
+    let loadEntities: Promise<any>;
+    if (!this.optionsLoaded) {
+      loadEntities = Promise.all([
+        this.getCabinets(),
+        this.getLessons(),
+        this.getTeachers()
+      ]);
+    } else {
+      loadEntities = Promise.resolve();
+    }
+    loadEntities.then(() => {
+      this.lessonsOptions = defaultEntityAdapter(Object.keys(this.lessons)
+          .map((id) => this.lessons[id] as NamedEntity));
+      this.teachersOptions = defaultEntityAdapter(Object.keys(this.teachers)
+          .map((id) => this.teachers[id] as NamedEntity));
+      this.cabinetsOptions = cabinetsAdapter(Object.keys(this.cabinets)
+          .map((id) => this.cabinets[id] as Cabinet));
+    })
 
-  private createEntryDto(entry: TimetableEntry | TimetableEntryDTO): TimetableEntryDTO {
+  }*/
+
+  protected createEntryDto(entry: TimetableEntry | TimetableEntryDTO): TimetableEntryDTO {
     const teacherIds = (this.entry as TimetableEntry).teachers
         ? (this.entry as TimetableEntry).teachers.map(teacher => teacher.id as number)
         : (this.entry as TimetableEntryDTO).teacherIds;
