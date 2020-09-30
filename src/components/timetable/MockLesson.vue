@@ -10,8 +10,8 @@
 <script lang="ts">
 import {Component, Prop, Vue} from 'vue-property-decorator';
 import {TimetableEntryView} from "@/utils/timetables";
-import {TimetableFormEmpty} from "@/store/entities/types";
 import {TimetableEntryType} from "ggtu-timetable-api-client";
+import { TimetableFormEmpty } from '@/store/entities/types';
 
 @Component({
   name: 'MockLesson'
