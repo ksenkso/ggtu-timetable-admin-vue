@@ -1,5 +1,5 @@
 <template>
-  <div class="timetable-form__fragment" v-if="data">
+  <div class="timetable-form__fragment timetable-form__fragment_patch" v-if="data">
     <Form ref="form" no-submit-button>
       <div class="timetable-form__fields">
         <Field name="lessonId" label="Предмет">
@@ -17,16 +17,16 @@
             </Select>
           </template>
         </Field>
-        <Field v-for="index in teachersCount" :key="index" name="teacherIds" label="Преподаватель">
-          <template v-slot:input="{updateValue}">
-            <ListBox :default-value="data.teacherIds[index - 1]" @select="updateValue"
-                     :options="teachersOptions"></ListBox>
-          </template>
-        </Field>
         <Field name="index" label="Номер пары" type="number" :initial-value="`${data.index + 1}`">
           <template v-slot:input="{updateValue, value}">
             <input :value="value" type="number" class="form__control" @change="updateValue($event.target.value)" min="1"
                    max="6">
+          </template>
+        </Field>
+        <Field v-for="index in teachersCount" :key="index" name="teacherIds" label="Преподаватель">
+          <template v-slot:input="{updateValue}">
+            <ListBox :default-value="data.teacherIds[index - 1]" @select="updateValue"
+                     :options="teachersOptions"></ListBox>
           </template>
         </Field>
         <Button @click.native="addTeacherField" theme="primary">Добавить преподавателя</Button>
@@ -69,12 +69,16 @@ import WeekPicker from '@/components/timetable/WeekPicker.vue';
 import { TimetablePatchForm } from '@/store/entities/types';
 import { TimetableEntryHolder } from '@/utils/timetables';
 import TimetableFormFragment from '@/mixins/TimetableFormFragment';
+import { api } from '@/api';
+import { Prop } from 'vue-property-decorator';
 
 @Component({
   name: 'PatchesFormFragment',
   components: { Form, Field, Select, ListBox, DayPicker, WeekPicker, Button }
 })
 export default class PatchesFormFragment extends TimetableFormFragment<TimetablePatch, TimetablePatchDTO> implements TimetableEntryHolder<TimetablePatchForm> {
+
+  @Prop({ required: true }) groupId!: number;
 
   get canDeleteDate() {
     return this.data && this.data.dates.length > 1;
@@ -103,8 +107,8 @@ export default class PatchesFormFragment extends TimetableFormFragment<Timetable
       lessonId: data.lessonId,
       teacherIds: Array.isArray(data.teacherIds) ? data.teacherIds : [data.teacherIds],
       type: data.type,
-      index: this.index,
-      dates: data.dates
+      index: data.index - 1,
+      dates: data.dates,
     };
   }
 
@@ -124,8 +128,17 @@ export default class PatchesFormFragment extends TimetableFormFragment<Timetable
   }
 
   save() {
-    const data = this.form.getFormData();
-    console.log(data);
+    const entry = this.getTimetableEntry();
+    let request: Promise<any>;
+    if (entry.id < 1) {
+      request = api.patches.create({ ...entry, groupId: this.groupId })
+    } else {
+      request = api.patches.update(entry.id, entry);
+    }
+    request.then(() => {
+      alert('SUCCESS');
+      location.reload();
+    });
   }
 
 
@@ -133,16 +146,17 @@ export default class PatchesFormFragment extends TimetableFormFragment<Timetable
 </script>
 
 <style lang="sass">
-.form__fields
-  display: flex
-  column-gap: 1rem
-
 .timetable-form
   &__fragment
     padding: 1rem
     box-shadow: 0 2px 5px 0 rgba(0, 0, 0, .13)
     margin-bottom: 2rem
 
+    &_patch
+
+      .form__fields
+      display: flex
+      column-gap: 1rem
   &__fields
     flex-basis: 60%
 

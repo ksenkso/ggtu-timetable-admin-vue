@@ -28,7 +28,6 @@ const lessons = namespace('lessons');
 export default class TimetableFormFragment<C extends TimetableEntry | TimetablePatch, DTO extends TimetableEntryDTO | TimetablePatchDTO> extends Vue {
 
     @Prop({ required: true }) entry!: C | DTO;
-    @Prop({ required: true }) index!: number;
     @cabinets.Action(GET_ALL_ENTITIES) getCabinets!: () => Promise<void>;
     @teachers.Action(GET_ALL_ENTITIES) getTeachers!: () => Promise<void>;
     @lessons.Action(GET_ALL_ENTITIES) getLessons!: () => Promise<void>;

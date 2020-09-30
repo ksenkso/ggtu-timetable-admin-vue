@@ -272,4 +272,7 @@ export default class TimetableForm extends Vue {
     &_submit
       margin-left: .5rem
 
+.lesson
+  h3
+    margin-left: 1rem
 </style>
