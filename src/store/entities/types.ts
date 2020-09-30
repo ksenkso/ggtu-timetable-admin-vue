@@ -27,3 +27,6 @@ export interface TimetableEntryForm {
     type: TimetableEntryType;
     index: number;
 }
+ export interface TimetablePatchForm extends TimetableEntryForm {
+     dates: string[];
+ }
