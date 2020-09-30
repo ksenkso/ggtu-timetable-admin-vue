@@ -81,8 +81,11 @@ export default {
 @import "../../assets/functions"
 .form
   &__field
-    margin-bottom: 1rem
+    margin: 1rem 0
     width: 100%
+
+    &:first-child
+      margin-top: 0
 
     &_inline
       display: flex
