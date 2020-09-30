@@ -23,6 +23,12 @@
                      :options="teachersOptions"></ListBox>
           </template>
         </Field>
+        <Field name="index" label="Номер пары" type="number" :initial-value="`${data.index + 1}`">
+          <template v-slot:input="{updateValue, value}">
+            <input :value="value" type="number" class="form__control" @change="updateValue($event.target.value)" min="1"
+                   max="6">
+          </template>
+        </Field>
         <Button @click.native="addTeacherField" theme="primary">Добавить преподавателя</Button>
         <Field name="cabinetId" label="Кабинет">
           <template v-slot:input="{updateValue}">
@@ -98,7 +104,7 @@ export default class PatchesFormFragment extends TimetableFormFragment<Timetable
       teacherIds: Array.isArray(data.teacherIds) ? data.teacherIds : [data.teacherIds],
       type: data.type,
       index: this.index,
-      dates: []
+      dates: data.dates
     };
   }
 
@@ -132,6 +138,11 @@ export default class PatchesFormFragment extends TimetableFormFragment<Timetable
   column-gap: 1rem
 
 .timetable-form
+  &__fragment
+    padding: 1rem
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, .13)
+    margin-bottom: 2rem
+
   &__fields
     flex-basis: 60%
 
