@@ -3,7 +3,7 @@
     <slot name="label">
       <label :for="id" class="form__label">{{ label }}</label>
     </slot>
-    <slot name="input" :updateValue="updateValue" :disabled="disabled" :readonly="readonly">
+    <slot name="input" :updateValue="updateValue" :disabled="disabled" :readonly="readonly" :value="value">
       <input
           class="form__control"
           @input="$emit('input', $event)"
@@ -69,6 +69,11 @@ export default {
       this.value = newValue;
     },
   },
+  mounted() {
+    if (this.initialValue !== undefined) {
+      this.updateValue(this.value);
+    }
+  }
 }
 </script>
 
