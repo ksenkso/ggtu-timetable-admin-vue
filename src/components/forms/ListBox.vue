@@ -16,7 +16,7 @@
     </div>
     <input ref="input"
            type="text"
-           class="list-box__input"
+           class="form__control"
            v-model="displayValue"
            @blur="onBlur"
            @input="onInput"

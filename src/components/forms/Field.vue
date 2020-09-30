@@ -72,11 +72,11 @@ export default {
 }
 </script>
 
-<style scoped lang="sass">
+<style lang="sass">
 @import "../../assets/functions"
 .form
   &__field
-    margin-bottom: .5em
+    margin-bottom: 1rem
     width: 100%
 
     &_inline
@@ -98,6 +98,11 @@ export default {
     border: 1px solid #aaa
     border-radius: 3px
     vertical-align: baseline
+    line-height: 1.6
+    height: 35px
     outline-color: scale-color(theme-color("primary"), $lightness: 30%)
+    background-color: #ffffff
 
+    &[type="date"], &[type="datetime"]
+      max-height: 35px
 </style>

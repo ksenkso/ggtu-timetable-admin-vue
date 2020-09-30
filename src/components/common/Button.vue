@@ -45,6 +45,7 @@ export default {
   &[disabled]
     filter: grayscale(70%)
     color: theme-color("light")
+    cursor: not-allowed
   &_block
     display: block
     width: 100%
