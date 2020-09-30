@@ -1,36 +1,51 @@
 <template>
   <div class="timetable-form__fragment" v-if="data">
-    <Button theme="danger" @click.native="$emit('remove', index)">Удалить изменение</Button>
     <Form ref="form" no-submit-button>
-      <Field name="lessonId" label="Предмет">
-        <template v-slot:input="{updateValue}">
-          <ListBox :default-value="data.lessonId" @select="updateValue" :options="lessonsOptions"></ListBox>
-        </template>
-      </Field>
-      <Field name="type" label="Тип занятия">
-        <template v-slot:input="{updateValue}">
-          <Select
-              :initial-value="data.type"
-              @change="updateValue"
-              name="type"
-              :options="entryTypes">
-          </Select>
-        </template>
-      </Field>
-      <Field v-for="index in teachersCount" :key="index" name="teacherIds" label="Преподаватель">
-        <template v-slot:input="{updateValue}">
-          <ListBox :default-value="data.teacherIds[index - 1]" @select="updateValue"
-                   :options="teachersOptions"></ListBox>
-        </template>
-      </Field>
-      <Button @click.native="addTeacherField" theme="primary">Добавить преподавателя</Button>
-      <Field name="cabinetId" label="Кабинет">
-        <template v-slot:input="{updateValue}">
-          <ListBox :default-value="data.cabinetId" @select="updateValue" :options="cabinetsOptions"></ListBox>
-        </template>
-      </Field>
-      <slot></slot>
+      <div class="timetable-form__fields">
+        <Field name="lessonId" label="Предмет">
+          <template v-slot:input="{updateValue}">
+            <ListBox :default-value="data.lessonId" @select="updateValue" :options="lessonsOptions"></ListBox>
+          </template>
+        </Field>
+        <Field name="type" label="Тип занятия">
+          <template v-slot:input="{updateValue}">
+            <Select
+                :initial-value="data.type"
+                @change="updateValue"
+                name="type"
+                :options="entryTypes">
+            </Select>
+          </template>
+        </Field>
+        <Field v-for="index in teachersCount" :key="index" name="teacherIds" label="Преподаватель">
+          <template v-slot:input="{updateValue}">
+            <ListBox :default-value="data.teacherIds[index - 1]" @select="updateValue"
+                     :options="teachersOptions"></ListBox>
+          </template>
+        </Field>
+        <Button @click.native="addTeacherField" theme="primary">Добавить преподавателя</Button>
+        <Field name="cabinetId" label="Кабинет">
+          <template v-slot:input="{updateValue}">
+            <ListBox :default-value="data.cabinetId" @select="updateValue" :options="cabinetsOptions"></ListBox>
+          </template>
+        </Field>
+      </div>
+      <div class="timetable-form__dates">
+        <!-- use div here because label will not provide any accessibility for ALL inputs and will cause errors in DOM-->
+        <div class="form__label">Даты</div>
+        <div class="date" v-for="(date, dateIndex) in data.dates" :key="dateIndex">
+          <Field name="dates" label="Даты" type="date" :initial-value="date">
+            <template slot="label">{{ '' }}</template>
+          </Field>
+          <Button :disabled="!canDeleteDate" theme="danger" @click.native="removeDate(date)">Удалить</Button>
+        </div>
+        <Button theme="primary" class="button_block" @click.native="addDate">Добавить дату</Button>
+      </div>
     </Form>
+    <div class="timetable-form__buttons">
+      <Button theme="success" @click.native="save">Сохранить</Button>
+      <Button theme="danger" @click.native="$emit('remove', index)">Удалить изменение</Button>
+    </div>
   </div>
 </template>
 
@@ -48,44 +63,31 @@ import WeekPicker from '@/components/timetable/WeekPicker.vue';
 import { TimetablePatchForm } from '@/store/entities/types';
 import { TimetableEntryHolder } from '@/utils/timetables';
 import TimetableFormFragment from '@/mixins/TimetableFormFragment';
-/*
-const cabinets = namespace('cabinets');
-const teachers = namespace('teachers');
-const lessons = namespace('lessons');*/
 
 @Component({
-  name: 'TimetableFormFragment',
+  name: 'PatchesFormFragment',
   components: { Form, Field, Select, ListBox, DayPicker, WeekPicker, Button }
 })
 export default class PatchesFormFragment extends TimetableFormFragment<TimetablePatch, TimetablePatchDTO> implements TimetableEntryHolder<TimetablePatchForm> {
-  /*
-    @Prop({ required: true }) entry!: TimetablePatch | TimetablePatchDTO;
-    @Prop({ required: true }) index!: number;
-    @cabinets.Action(GET_ALL_ENTITIES) getCabinets!: () => Promise<void>;
-    @teachers.Action(GET_ALL_ENTITIES) getTeachers!: () => Promise<void>;
-    @lessons.Action(GET_ALL_ENTITIES) getLessons!: () => Promise<void>;
-    @cabinets.State('entities') cabinets!: Dictionary<Cabinet>;
-    @teachers.State('entities') teachers!: NamedEntityDict;
-    @lessons.State('entities') lessons!: NamedEntityDict;
-    @cabinets.State('isLoaded') cabinetsLoaded!: boolean;
-    @teachers.State('isLoaded') teachersLoaded!: boolean;
-    @lessons.State('isLoaded') lessonsLoaded!: boolean;
 
-    get optionsLoaded(): boolean {
-      return this.cabinetsLoaded && this.teachersLoaded && this.lessonsLoaded;
-    }
+  get canDeleteDate() {
+    return this.data && this.data.dates.length > 1;
+  }
 
-    @Ref() form!: Form;
-    data: TimetablePatchDTO | null = null;
-    lessonsOptions: SelectOption[] = [];
-    teachersOptions: SelectOption[] = [];
-    cabinetsOptions: SelectOption[] = [];
-    entryTypes: SelectOption[] = [
-      { value: 0, name: 'Лекция' },
-      { value: 1, name: 'Практическое занятие' },
-      { value: 2, name: 'Лабораторная работа' },
-    ];
-    teachersCount = 1;*/
+  protected createEntryDto(entry: TimetablePatch | TimetablePatchDTO): TimetablePatchDTO {
+    const teacherIds = (this.entry as TimetablePatch).teachers
+        ? (this.entry as TimetablePatch).teachers.map(teacher => teacher.id as number)
+        : (this.entry as TimetablePatchDTO).teacherIds;
+    return {
+      cabinetId: entry.cabinetId,
+      groupId: entry.groupId,
+      index: entry.index,
+      lessonId: entry.lessonId,
+      teacherIds,
+      type: entry.type,
+      dates: this.entry.dates.slice(0)
+    };
+  }
 
   getTimetableEntry(): TimetablePatchForm {
     const data = this.form.getFormData();
@@ -100,52 +102,64 @@ export default class PatchesFormFragment extends TimetableFormFragment<Timetable
     };
   }
 
-  /*addTeacherField() {
-    this.teachersCount++;
-  }
-
-
-  mounted() {
-    this.data = this.createEntryDto(this.entry);
-    this.teachersCount = Math.max(this.data.teacherIds.length, 1);
-    let loadEntities: Promise<any>;
-    if (!this.optionsLoaded) {
-      loadEntities = Promise.all([
-        this.getCabinets(),
-        this.getLessons(),
-        this.getTeachers()
-      ]);
-    } else {
-      loadEntities = Promise.resolve();
+  addDate() {
+    if (this.data) {
+      const dateString = (new Date()).toISOString().substring(0, 10);
+      console.log(dateString)
+      this.data.dates.push(dateString);
     }
-    loadEntities.then(() => {
-      this.lessonsOptions = defaultEntityAdapter(Object.keys(this.lessons)
-          .map((id) => this.lessons[id] as NamedEntity));
-      this.teachersOptions = defaultEntityAdapter(Object.keys(this.teachers)
-          .map((id) => this.teachers[id] as NamedEntity));
-      this.cabinetsOptions = cabinetsAdapter(Object.keys(this.cabinets)
-          .map((id) => this.cabinets[id] as Cabinet));
-    })
-
-  }*/
-
-  protected createEntryDto(entry: TimetablePatch | TimetablePatchDTO): TimetablePatchDTO {
-    const teacherIds = (this.entry as TimetablePatch).teachers
-        ? (this.entry as TimetablePatch).teachers.map(teacher => teacher.id as number)
-        : (this.entry as TimetablePatchDTO).teacherIds;
-    return {
-      cabinetId: entry.cabinetId,
-      groupId: entry.groupId,
-      index: entry.index,
-      lessonId: entry.lessonId,
-      teacherIds,
-      type: entry.type,
-      dates: []
-    };
   }
+
+  removeDate(date: string) {
+    if (this.data && this.canDeleteDate) {
+      const dateIndex = this.data.dates.findIndex(d => d === date);
+      this.data.dates.splice(dateIndex, 1);
+    }
+  }
+
+  save() {
+    const data = this.form.getFormData();
+    console.log(data);
+  }
+
+
 }
 </script>
 
-<style scoped>
+<style lang="sass">
+.form__fields
+  display: flex
+  column-gap: 1rem
 
+.timetable-form
+  &__fields
+    flex-basis: 60%
+
+  &__dates
+    display: flex
+    flex-direction: column
+    flex-basis: 40%
+
+  &__buttons
+    margin-left: auto
+    width: calc(40% - .4rem)
+    // as close as i could do
+    display: flex
+    column-gap: 1rem
+
+    > *
+      flex-grow: 1
+
+.date
+  margin-bottom: .5rem
+  display: flex
+  column-gap: .5rem
+
+  .form__field
+    margin-bottom: 0
+
+  input
+    padding: 6px 12px
+    max-height: 39px
+    flex-grow: 1
 </style>
