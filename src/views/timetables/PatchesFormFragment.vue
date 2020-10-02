@@ -152,9 +152,7 @@ export default class PatchesFormFragment extends TimetableFormFragment<Timetable
     box-shadow: 0 2px 5px 0 rgba(0, 0, 0, .13)
     margin-bottom: 2rem
 
-    &_patch
-
-      .form__fields
+    &_patch .form__fields
       display: flex
       column-gap: 1rem
   &__fields
