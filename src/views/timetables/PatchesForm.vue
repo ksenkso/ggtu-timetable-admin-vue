@@ -1,24 +1,21 @@
 <template>
   <Page :title="title">
-    <div class="entry" v-for="entry in entries" :key="entry.id">
-      <PatchesFormFragment :entry="entry" :group-id="group.id"></PatchesFormFragment>
+    <div class="entry" v-for="patch in patches" :key="patch.id">
+      <PatchesFormFragment :entry="patch" :group-id="group.id"></PatchesFormFragment>
     </div>
     <Button theme="primary" @click.native="addPatch">Добавить изменение</Button>
   </Page>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import {Component, Vue} from 'vue-property-decorator';
 import Page from '../Page.vue';
-import { NavigationGuardNext, Route } from 'vue-router';
-import { api } from '@/api';
-import { TimetablePatch } from 'ggtu-timetable-api-client';
-import { TimetablePatchDTO } from 'ggtu-timetable-api-client';
-import { TimetableEntryType } from 'ggtu-timetable-api-client';
+import {NavigationGuardNext, Route} from 'vue-router';
+import {api} from '@/api';
+import {CreatePatchDto, Group, LessonType, Patch, UpdatePatchDto} from 'ggtu-timetable-api-client';
 import PatchesFormFragment from '@/views/timetables/PatchesFormFragment.vue';
-import { Group } from 'ggtu-timetable-api-client';
 
-function patchesAdapter(patches: TimetablePatch[]): any {
+function patchesAdapter(patches: Patch[]): any {
   // patches.reduce((date))
   return patches;
 }
@@ -33,7 +30,7 @@ Component.registerHooks([
 })
 export default class PatchesForm extends Vue {
 
-  entries: any = [];
+  patches: (Patch | UpdatePatchDto)[] = [];
   group: Group | null = null;
   isLoading = true;
 
@@ -48,20 +45,27 @@ export default class PatchesForm extends Vue {
     return title;
   }
 
-  addPatch() {
-    this.entries.push(this.createPatch())
+  getLessonKey(lesson: Patch | CreatePatchDto): number {
+    if ((lesson as Patch).id) {
+      return (lesson as Patch).id;
+    }
+    return -Math.random();
   }
 
-  createPatch(): TimetablePatchDTO {
+  addPatch() {
+    this.patches.push(this.createPatch())
+  }
+
+  createPatch(): UpdatePatchDto {
     return {
       id: Math.random() * .9,
       cabinetId: 0,
-      dates: [(new Date()).toISOString().substring(0, 10)],
+      dates: [(new Date()).toISOString()],
       groupId: 0,
       index: 0,
-      lessonId: 0,
+      subjectId: 0,
       teacherIds: [],
-      type: TimetableEntryType.Lecture
+      type: LessonType.Lecture
     }
   }
 
@@ -76,7 +80,7 @@ export default class PatchesForm extends Vue {
             })
         api.patches.getForGroup(+to.params.groupId)
             .then(patches => {
-              (vm as PatchesForm).entries = patchesAdapter(patches);
+              (vm as PatchesForm).patches = patchesAdapter(patches);
               (vm as PatchesForm).isLoading = false;
             })
       })

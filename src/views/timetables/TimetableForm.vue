@@ -1,19 +1,14 @@
 <template>
   <Page :title="title">
-    <WeekPicker :default-week="week" @change="setWeek"></WeekPicker>
-    <DayPicker :default-day="day" @change="setDay"></DayPicker>
+    <WeekPicker :default-week="week" @change="chooseWeek"></WeekPicker>
+    <DayPicker :default-day="day" @change="chooseDay"></DayPicker>
     <Alert v-if="!notEmptyDay" theme="warning">Нет занятий в этот день</Alert>
     <div class="fragments" v-if="loaded && notEmptyDay">
       <div class="lesson" v-for="(entry, index) in currentDay" :key="entry.id">
         <h3>Пара {{ index + 1 }}</h3>
-        <component
-            ref="forms"
-            :is="componentForEntry(entry)"
-            :entry="entry"
-            :index="index"
-            @remove="removeLesson"
-            @set="setLesson"
-        ></component>
+        <RegularEntryForm ref="forms" v-if="entry.lesson" :index="index" :entry="entry.lesson"
+                          @remove="removeLesson"></RegularEntryForm>
+        <MockLesson v-else :index="index" @set="setLesson"></MockLesson>
       </div>
     </div>
     <div class="buttons">
@@ -25,44 +20,59 @@
 </template>
 
 <script lang="ts">
+import {v4} from 'uuid';
 import {Component, Ref, Vue} from 'vue-property-decorator';
 import Page from "../Page.vue";
 import {
   Cabinet,
+  CreateLessonDto,
   Day,
   Group,
-  TimetableEntry,
-  TimetableEntryDTO,
-  TimetableEntryType,
+  LessonType,
+  UpdateLessonDto,
   Week,
   WithId
 } from 'ggtu-timetable-api-client';
-import { NavigationGuardNext, Route } from 'vue-router';
-import { api } from '@/api';
+import {NavigationGuardNext, Route} from 'vue-router';
+import {api} from '@/api';
 import RegularEntryForm from '@/views/timetables/RegularEntryForm.vue';
-import { ButtonGroupValue } from '@/components/common/ButtonGroup.vue';
+import {ButtonGroupValue} from '@/components/common/ButtonGroup.vue';
 import WeekPicker from '@/components/timetable/WeekPicker.vue';
 import DayPicker from '@/components/timetable/DayPicker.vue';
-import { namespace } from 'vuex-class';
-import { NamedEntityDict } from '@/store/entities/types';
-import { Dictionary } from 'vue-router/types/router';
-import { GET_ALL_ENTITIES } from '@/store/entities/action-types';
+import {namespace} from 'vuex-class';
+import {NamedEntityDict} from '@/store/entities/types';
+import {Dictionary} from 'vue-router/types/router';
+import {GET_ALL_ENTITIES} from '@/store/entities/action-types';
 import MockLesson from '@/components/timetable/MockLesson.vue';
-import { TimetableEntryHolder } from '@/utils/timetables';
+import {LessonHolder} from '@/utils/timetables';
+import {SET_DAY, SET_GROUP_ID, SET_WEEK} from "@/store/editor/mutations-types";
 
 Component.registerHooks([
   'beforeRouteEnter',
 ]);
 const cabinets = namespace('cabinets');
 const teachers = namespace('teachers');
-const lessons = namespace('lessons');
-let loadedTimetable: (TimetableEntry | TimetableEntryDTO)[][][] = [
+const lessons = namespace('subjects');
+const editor = namespace('editor');
+
+let loadedTimetable: { id: string; lesson?: CreateLessonDto | UpdateLessonDto }[][][] = [
   [],
   []
 ];
+
+function createEmptyTimetable(): { id: string; lesson?: CreateLessonDto | UpdateLessonDto }[][][] {
+  return [
+    [
+      [], [], [], [], [], [],
+    ], [
+      [], [], [], [], [], [],
+    ]
+  ];
+}
+
 @Component({
   name: 'TimetableForm',
-  components: { Page, RegularEntryForm, WeekPicker, DayPicker, MockLesson }
+  components: {Page, RegularEntryForm, WeekPicker, DayPicker, MockLesson}
 })
 export default class TimetableForm extends Vue {
 
@@ -73,16 +83,19 @@ export default class TimetableForm extends Vue {
   @cabinets.Action(GET_ALL_ENTITIES) getCabinets!: () => Promise<void>;
   @teachers.Action(GET_ALL_ENTITIES) getTeachers!: () => Promise<void>;
   @lessons.Action(GET_ALL_ENTITIES) getLessons!: () => Promise<void>;
+  @editor.Mutation(SET_GROUP_ID) setGroupId!: (id: number) => void;
+  @editor.Mutation(SET_WEEK) setWeek!: (id: number) => void;
+  @editor.Mutation(SET_DAY) setDay!: (id: number) => void;
 
-  @Ref() forms!: (RegularEntryForm | MockLesson)[];
+  @Ref() forms!: LessonHolder[];
 
   group: WithId<Group> | null = null;
   day = 0;
   week = 0;
   entitiesLoaded = false;
-  timetable: (TimetableEntry | TimetableEntryDTO)[][][] = [];
-  currentDay: (TimetableEntry | TimetableEntryDTO)[] = [];
-  // loadedTimetable: Array<readonly (TimetableEntry | TimetableEntryDTO)[][]> = [];
+  timetable: { id: string; lesson?: CreateLessonDto | UpdateLessonDto }[][][] = [];
+  currentDay: { id: string; lesson?: CreateLessonDto | UpdateLessonDto }[] = [];
+  // loadedTimetable: Array<readonly (Lesson | CreateLessonDto)[][]> = [];
   loading = false;
 
   get title() {
@@ -94,14 +107,14 @@ export default class TimetableForm extends Vue {
   }
 
   get notEmptyDay() {
-    return this.currentDay.some(entry => entry.type !== TimetableEntryType.Empty);
+    return this.currentDay.some(entry => entry.lesson);
   }
 
   removeLesson(index: number) {
     if (index === this.currentDay.length - 1) {
       this.currentDay.pop();
     } else {
-      Vue.set(this.currentDay, index, this.createEntry(TimetableEntryType.Empty));
+      Vue.set(this.currentDay, index, this.createEntry(LessonType.Empty));
     }
 
   }
@@ -110,17 +123,19 @@ export default class TimetableForm extends Vue {
     Vue.set(this.currentDay, index, this.createEntry());
   }
 
-  componentForEntry(entry: TimetableEntry | TimetableEntryDTO): string {
-    return entry.type === TimetableEntryType.Empty ? 'MockLesson' : 'RegularEntryForm';
+  componentForEntry(entry: { id?: number }): string {
+    return entry.id ? 'RegularEntryForm' : 'MockLesson';
   }
 
-  setDay(day: ButtonGroupValue) {
+  chooseDay(day: ButtonGroupValue) {
     this.day = day.index;
+    this.setDay(this.day);
     this.updateCurrentDay()
   }
 
-  setWeek(week: ButtonGroupValue) {
+  chooseWeek(week: ButtonGroupValue) {
     this.week = week.index;
+    this.setWeek(this.week);
     this.loadEntries()
         .then(() => this.updateCurrentDay());
   }
@@ -131,26 +146,25 @@ export default class TimetableForm extends Vue {
 
   submitTimetable() {
     const requests: Promise<any>[] = this.forms
-        .map((form: TimetableEntryHolder<any>) => {
-          return ({
-            groupId: this.group && this.group.id,
-            day: this.day,
-            week: this.week,
-            ...form.getTimetableEntry()
-          }) as TimetableEntryDTO;
+        .map((form) => {
+          return form.getLesson();
         })
-        .filter(entry => entry.type !== TimetableEntryType.Empty)
+        // .filter(entry => entry.type !== LessonType.Empty)
         .map(dto => {
-          return (dto.id as number) < 1
-              ? api.timetable.create(dto)
-              : api.timetable.update(dto.id as number, dto)
+          return (dto as UpdateLessonDto).id
+              ? api.timetable.update((dto as UpdateLessonDto).id as number, dto)
+              : api.timetable.create(dto as CreateLessonDto)
         });
-    // check if any lessons were deleted
+    // check if any subjects were deleted
 
     const lessonsToRemove = loadedTimetable[this.week][this.day]
         .reduce<number[]>((toRemove, loaded) => {
-          if (!this.currentDay.find(entry => entry && entry.id === loaded.id)) {
-            toRemove.push(loaded.id as number);
+          if (!this.currentDay.find(entry => {
+            return entry.lesson
+                && (entry.lesson as UpdateLessonDto).id
+                && (entry.lesson as UpdateLessonDto).id === (loaded.lesson as UpdateLessonDto).id;
+          })) {
+            toRemove.push((loaded.lesson as UpdateLessonDto).id as number);
           }
           return toRemove;
         }, [])
@@ -163,21 +177,39 @@ export default class TimetableForm extends Vue {
 
   }
 
-  createEntry(type: TimetableEntryType = TimetableEntryType.Lecture): TimetableEntryDTO {
+  createEntry(type: LessonType = LessonType.Lecture): { id: string; lesson: CreateLessonDto } {
     return {
-      id: Math.random() * 0.9, // use a fake id that is less then 1
-      cabinetId: 0,
-      day: Day.Monday,
-      groupId: this.group?.id || 0,
-      index: 0,
-      lessonId: 0,
-      teacherIds: [],
-      type,
-      week: Week.Top,
+      id: v4(),
+      lesson: {
+        // id: Math.random() * 0.9, // use a fake id that is less then 1
+        cabinetId: 0,
+        day: Day.Monday,
+        groupId: this.group?.id || 0,
+        index: this.nextIndex(),
+        subjectId: 0,
+        teacherIds: [],
+        type,
+        week: Week.Top,
+      }
     }
   }
 
+  nextIndex() {
+    let max = 0;
+    for (const entry of this.currentDay) {
+      if (entry.lesson && entry.lesson.index && entry.lesson.index > max) {
+        max = entry.lesson.index;
+      }
+    }
+    return max === 0 ? max : max + 1;
+  }
+
   mounted() {
+    if (this.group) {
+      this.setGroupId(this.group.id);
+    }
+    this.setDay(this.day);
+    this.setWeek(this.week);
     Promise.all([
       this.getCabinets(),
       this.getLessons(),
@@ -194,14 +226,10 @@ export default class TimetableForm extends Vue {
     return api.timetable.getForGroupByWeek(this.group.id, this.week)
         .then(entries => {
           if (!entries.length) {
-            this.timetable = Array(2).fill(0).map(() => ([
-              [], [], [], [], [], [],
-            ]));
-            loadedTimetable = Array(2).fill(0).map(() => ([
-              [], [], [], [], [], [],
-            ]));
+            this.timetable = createEmptyTimetable();
+            loadedTimetable = createEmptyTimetable();
           } else {
-            let days: TimetableEntry[][] = [
+            let days: { id: string; lesson?: CreateLessonDto | UpdateLessonDto }[][] = [
               [],
               [],
               [],
@@ -210,30 +238,33 @@ export default class TimetableForm extends Vue {
               [],
             ];
             entries.reduce((days, entry) => {
-              days[entry.day].push(entry);
+              days[entry.day].push({
+                id: v4(),
+                lesson: {...entry, teacherIds: entry.teachers.map(teacher => teacher.id)}
+              });
               return days;
             }, days);
-            days = days.map(day => {
-              day.sort((a, b) => a.index - b.index);
+            days = days.map((day) => {
+              (day as { id: string; lesson: CreateLessonDto }[]).sort((a, b) => a.lesson.index - b.lesson.index);
               /**
-               * Go through entries array and fill in null values if indices do not match.
+               * Go through patches array and fill in null values if indices do not match.
                */
               const filledEntries = [];
               let lessonIndex = 0, entryIndex = 0;
               while (entryIndex < day.length) {
                 // this entry is not in its place, so there should be null
-                if (day[entryIndex].index !== lessonIndex) {
-                  filledEntries.push(this.createEntry(TimetableEntryType.Empty));
+                if ((day as { id: string; lesson: CreateLessonDto }[])[entryIndex].lesson.index !== lessonIndex) {
+                  filledEntries.push({id: v4()});
                 } else {
                   filledEntries.push(day[entryIndex]);
                   entryIndex++;
                 }
                 lessonIndex++;
               }
-              return filledEntries as TimetableEntry[];
+              return filledEntries;
             });
-            loadedTimetable[this.week] = days.map(day => day.map(entry => Object.assign({}, entry)));
-            this.timetable[this.week] = days;
+            loadedTimetable[this.week] = days.map(day => day.map(entry => Object.assign({}, entry))) as { id: string; lesson?: CreateLessonDto | UpdateLessonDto }[][];
+            this.timetable[this.week] = days as { id: string; lesson?: CreateLessonDto | UpdateLessonDto }[][];
             this.updateCurrentDay();
           }
           this.loading = false;

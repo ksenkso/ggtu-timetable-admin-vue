@@ -29,6 +29,6 @@ export interface LessonForm {
     index: number;
 }
 
-export interface TimetablePatchForm extends LessonForm {
+export interface PatchForm extends LessonForm {
     dates: string[];
 }

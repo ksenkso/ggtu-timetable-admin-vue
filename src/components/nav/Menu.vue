@@ -29,7 +29,7 @@ export default class Menu extends Vue {
   items: MenuItem[] = [
     {link: '/groups', text: 'Группы'},
     {link: '/teachers', text: 'Учителя'},
-    {link: '/lessons', text: 'Предметы'},
+    {link: '/subjects', text: 'Предметы'},
     {link: '/buildings', text: 'Здания'},
     {link: '/cabinets', text: 'Кабинеты'},
   ];

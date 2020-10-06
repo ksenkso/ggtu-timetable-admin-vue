@@ -8,24 +8,13 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
-import { TimetableEntryHolder } from '@/utils/timetables';
-import { TimetableEntryType } from 'ggtu-timetable-api-client';
-import { TimetableFormEmpty } from '@/store/entities/types';
+import {Component, Prop, Vue} from 'vue-property-decorator';
 
 @Component({
   name: 'MockLesson'
 })
-export default class MockLesson extends Vue implements TimetableEntryHolder<TimetableFormEmpty> {
+export default class MockLesson extends Vue {
   @Prop({ required: true }) index!: number;
-
-  getTimetableEntry(): TimetableFormEmpty {
-    return {
-      id: Math.random() * 0.9,
-      type: TimetableEntryType.Empty,
-      index: this.index,
-    }
-  }
 
 }
 </script>

@@ -27,7 +27,7 @@ import {AbstractDataLoader} from "@/views/cabinets/DataLoader";
 import {Store} from "vuex";
 import {RootState} from "@/store/types";
 
-const lessons = namespace('lessons');
+const lessons = namespace('subjects');
 
 class LessonsLoader extends AbstractDataLoader {
 
@@ -36,7 +36,7 @@ class LessonsLoader extends AbstractDataLoader {
   }
 
   async load() {
-    return this.store.dispatch('lessons/' + GET_ALL_ENTITIES);
+    return this.store.dispatch('subjects/' + GET_ALL_ENTITIES);
   }
 
 }

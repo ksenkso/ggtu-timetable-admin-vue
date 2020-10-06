@@ -1,30 +1,29 @@
-import { Component, Prop, Ref, Vue } from 'vue-property-decorator';
-import { Cabinet } from 'ggtu-timetable-api-client';
-import { Patch, Lesson, CreateLessonDto, CreatePatchDto } from 'ggtu-timetable-api-client';
+import {Component, Prop, Ref, Vue} from 'vue-property-decorator';
+import {Cabinet, CreateLessonDto, CreatePatchDto, UpdateLessonDto, UpdatePatchDto} from 'ggtu-timetable-api-client';
 import Form from '../components/forms/Form.vue';
 import Field from '../components/forms/Field.vue';
 import Select from '../components/forms/Select.vue';
 import ListBox from '@/components/forms/ListBox.vue';
-import { cabinetsAdapter, defaultEntityAdapter, SelectOption } from '@/utils/lists';
+import {cabinetsAdapter, defaultEntityAdapter, SelectOption} from '@/utils/lists';
 import DayPicker from '@/components/timetable/DayPicker.vue';
 import Button from '@/components/common/Button.vue';
 import WeekPicker from '@/components/timetable/WeekPicker.vue';
-import { NamedEntity, NamedEntityDict } from '@/store/entities/types';
-import { namespace } from 'vuex-class';
-import { Dictionary } from 'vue-router/types/router';
-import { GET_ALL_ENTITIES } from '@/store/entities/action-types';
+import {NamedEntity, NamedEntityDict} from '@/store/entities/types';
+import {namespace} from 'vuex-class';
+import {Dictionary} from 'vue-router/types/router';
+import {GET_ALL_ENTITIES} from '@/store/entities/action-types';
 
 const cabinets = namespace('cabinets');
 const teachers = namespace('teachers');
-const lessons = namespace('lessons');
+const lessons = namespace('subjects');
 
 @Component({
     name: 'TimetableFormFragment',
-    components: { Form, Field, Select, ListBox, DayPicker, WeekPicker, Button }
+    components: {Form, Field, Select, ListBox, DayPicker, WeekPicker, Button}
 })
-export default class TimetableFormFragment<C extends Lesson | Patch, DTO extends CreateLessonDto | CreatePatchDto> extends Vue {
+export default class TimetableFormFragment<C extends (UpdateLessonDto | UpdatePatchDto), DTO extends (CreateLessonDto | CreatePatchDto)> extends Vue {
 
-    @Prop({ required: true }) entry!: C | DTO;
+    @Prop({required: true}) entry!: C | DTO;
     @cabinets.Action(GET_ALL_ENTITIES) getCabinets!: () => Promise<void>;
     @teachers.Action(GET_ALL_ENTITIES) getTeachers!: () => Promise<void>;
     @lessons.Action(GET_ALL_ENTITIES) getLessons!: () => Promise<void>;
@@ -45,9 +44,9 @@ export default class TimetableFormFragment<C extends Lesson | Patch, DTO extends
     teachersOptions: SelectOption[] = [];
     cabinetsOptions: SelectOption[] = [];
     entryTypes: SelectOption[] = [
-        { value: 0, name: 'Лекция' },
-        { value: 1, name: 'Практическое занятие' },
-        { value: 2, name: 'Лабораторная работа' },
+        {value: 0, name: 'Лекция'},
+        {value: 1, name: 'Практическое занятие'},
+        {value: 2, name: 'Лабораторная работа'},
     ];
     teachersCount = 1;
     teacherIds?: number[] | null = null;
@@ -55,7 +54,6 @@ export default class TimetableFormFragment<C extends Lesson | Patch, DTO extends
     addTeacherField() {
         this.teachersCount++;
     }
-
 
     mounted() {
         this.data = this.createEntryDto(this.entry);
@@ -82,15 +80,12 @@ export default class TimetableFormFragment<C extends Lesson | Patch, DTO extends
     }
 
     protected createEntryDto(entry: C | DTO): DTO {
-        const teacherIds = (this.entry as C).teachers
-            ? (this.entry as C).teachers.map(teacher => teacher.id as number)
-            : (this.entry as DTO).teacherIds;
         return {
             cabinetId: entry.cabinetId,
             groupId: entry.groupId,
             index: entry.index,
             subjectId: entry.subjectId,
-            teacherIds,
+            teacherIds: entry.teacherIds,
             type: entry.type,
         } as unknown as DTO;
     }

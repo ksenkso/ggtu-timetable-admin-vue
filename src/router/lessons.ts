@@ -2,25 +2,25 @@ import {RouteConfig} from "vue-router";
 
 export default [
     {
-        path: '/lessons',
+        path: '/subjects',
         name: 'Lessons',
-        component: () => import(/* webpackChunkName: "lessons" */'../views/lessons/Lessons.vue'),
+        component: () => import(/* webpackChunkName: "subjects" */'../views/lessons/Lessons.vue'),
         meta: {
             private: true
         }
     },
     {
-        path: '/lessons/create',
+        path: '/subjects/create',
         name: 'LessonCreate',
-        component: () => import(/* webpackChunkName: "lessons" */'../views/lessons/LessonView.vue'),
+        component: () => import(/* webpackChunkName: "subjects" */'../views/lessons/LessonView.vue'),
         meta: {
             private: true
         }
     },
     {
-        path: '/lessons/:id',
+        path: '/subjects/:id',
         name: 'LessonUpdate',
-        component: () => import(/* webpackChunkName: "lessons" */'../views/lessons/LessonView.vue'),
+        component: () => import(/* webpackChunkName: "subjects" */'../views/lessons/LessonView.vue'),
         meta: {
             private: true
         }

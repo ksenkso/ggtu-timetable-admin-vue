@@ -1,6 +1,5 @@
-import {LessonForm} from "@/store/entities/types";
-import { EmptyLesson } from '@/store/entities/types';
+import {CreateLessonDto, CreatePatchDto} from "ggtu-timetable-api-client";
 
-export interface LessonHolder<T> {
-    getLesson(): LessonForm | EmptyLesson;
+export interface LessonHolder {
+    getLesson(): CreateLessonDto | CreatePatchDto;
 }
