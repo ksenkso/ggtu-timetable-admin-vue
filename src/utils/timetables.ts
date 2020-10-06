@@ -1,6 +1,6 @@
-import {TimetableEntryForm} from "@/store/entities/types";
-import { TimetableFormEmpty } from '@/store/entities/types';
+import {LessonForm} from "@/store/entities/types";
+import { EmptyLesson } from '@/store/entities/types';
 
-export interface TimetableEntryHolder<T> {
-    getTimetableEntry(): TimetableEntryForm | TimetableFormEmpty;
+export interface LessonHolder<T> {
+    getLesson(): LessonForm | EmptyLesson;
 }

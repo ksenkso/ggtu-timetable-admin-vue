@@ -1,9 +1,6 @@
 import { Component, Prop, Ref, Vue } from 'vue-property-decorator';
 import { Cabinet } from 'ggtu-timetable-api-client';
-import { TimetablePatch } from 'ggtu-timetable-api-client';
-import { TimetablePatchDTO } from 'ggtu-timetable-api-client';
-import { TimetableEntryDTO } from 'ggtu-timetable-api-client';
-import { TimetableEntry } from 'ggtu-timetable-api-client';
+import { Patch, Lesson, CreateLessonDto, CreatePatchDto } from 'ggtu-timetable-api-client';
 import Form from '../components/forms/Form.vue';
 import Field from '../components/forms/Field.vue';
 import Select from '../components/forms/Select.vue';
@@ -25,7 +22,7 @@ const lessons = namespace('lessons');
     name: 'TimetableFormFragment',
     components: { Form, Field, Select, ListBox, DayPicker, WeekPicker, Button }
 })
-export default class TimetableFormFragment<C extends TimetableEntry | TimetablePatch, DTO extends TimetableEntryDTO | TimetablePatchDTO> extends Vue {
+export default class TimetableFormFragment<C extends Lesson | Patch, DTO extends CreateLessonDto | CreatePatchDto> extends Vue {
 
     @Prop({ required: true }) entry!: C | DTO;
     @cabinets.Action(GET_ALL_ENTITIES) getCabinets!: () => Promise<void>;
@@ -92,7 +89,7 @@ export default class TimetableFormFragment<C extends TimetableEntry | TimetableP
             cabinetId: entry.cabinetId,
             groupId: entry.groupId,
             index: entry.index,
-            lessonId: entry.lessonId,
+            subjectId: entry.subjectId,
             teacherIds,
             type: entry.type,
         } as unknown as DTO;

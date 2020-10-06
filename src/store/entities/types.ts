@@ -1,4 +1,4 @@
-import { TimetableEntryType, WithId } from 'ggtu-timetable-api-client';
+import { LessonType, WithId } from 'ggtu-timetable-api-client';
 
 export interface NamedEntity {
     id?: number;
@@ -14,21 +14,21 @@ export interface EntitiesState {
     isLoaded: boolean;
 }
 
-export interface TimetableFormEmpty {
+export interface EmptyLesson {
     id: number;
-    type: TimetableEntryType;
+    type: LessonType;
     index: number;
 }
 
-export interface TimetableEntryForm {
+export interface LessonForm {
     id: number;
     cabinetId: number;
-    lessonId: number;
+    subjectId: number;
     teacherIds: number[];
-    type: TimetableEntryType;
+    type: LessonType;
     index: number;
 }
 
-export interface TimetablePatchForm extends TimetableEntryForm {
+export interface TimetablePatchForm extends LessonForm {
     dates: string[];
 }
