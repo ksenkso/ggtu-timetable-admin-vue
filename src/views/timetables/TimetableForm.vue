@@ -145,7 +145,7 @@ export default class TimetableForm extends Vue {
   }
 
   submitTimetable() {
-    const requests: Promise<any>[] = this.forms
+    const requests: Promise<unknown>[] = this.forms
         .map((form) => {
           return form.getLesson();
         })
@@ -205,9 +205,7 @@ export default class TimetableForm extends Vue {
   }
 
   mounted() {
-    if (this.group) {
-      this.setGroupId(this.group.id);
-    }
+
     this.setDay(this.day);
     this.setWeek(this.week);
     Promise.all([
@@ -220,9 +218,10 @@ export default class TimetableForm extends Vue {
         })
   }
 
-  loadEntries(): Promise<any> {
+  loadEntries(): Promise<void> {
     this.loading = true;
     if (!this.group) return Promise.resolve();
+    this.setGroupId(this.group.id);
     return api.timetable.getForGroupByWeek(this.group.id, this.week)
         .then(entries => {
           if (!entries.length) {

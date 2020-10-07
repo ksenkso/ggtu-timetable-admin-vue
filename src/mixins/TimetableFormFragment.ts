@@ -21,9 +21,9 @@ const lessons = namespace('subjects');
     name: 'TimetableFormFragment',
     components: {Form, Field, Select, ListBox, DayPicker, WeekPicker, Button}
 })
-export default class TimetableFormFragment<C extends (UpdateLessonDto | UpdatePatchDto), DTO extends (CreateLessonDto | CreatePatchDto)> extends Vue {
+export default class TimetableFormFragment<U extends (UpdateLessonDto | UpdatePatchDto), C extends (CreateLessonDto | CreatePatchDto)> extends Vue {
 
-    @Prop({required: true}) entry!: C | DTO;
+    @Prop({required: true}) entry!: U | C;
     @cabinets.Action(GET_ALL_ENTITIES) getCabinets!: () => Promise<void>;
     @teachers.Action(GET_ALL_ENTITIES) getTeachers!: () => Promise<void>;
     @lessons.Action(GET_ALL_ENTITIES) getLessons!: () => Promise<void>;
@@ -33,13 +33,14 @@ export default class TimetableFormFragment<C extends (UpdateLessonDto | UpdatePa
     @cabinets.State('isLoaded') cabinetsLoaded!: boolean;
     @teachers.State('isLoaded') teachersLoaded!: boolean;
     @lessons.State('isLoaded') lessonsLoaded!: boolean;
+    isReady = false;
 
     get optionsLoaded(): boolean {
         return this.cabinetsLoaded && this.teachersLoaded && this.lessonsLoaded;
     }
 
     @Ref() form!: Form;
-    data: DTO | null = null;
+    data: U = {} as U;
     lessonsOptions: SelectOption[] = [];
     teachersOptions: SelectOption[] = [];
     cabinetsOptions: SelectOption[] = [];
@@ -57,8 +58,9 @@ export default class TimetableFormFragment<C extends (UpdateLessonDto | UpdatePa
 
     mounted() {
         this.data = this.createEntryDto(this.entry);
-        this.teachersCount = Math.max(this.data.teacherIds.length, 1);
-        let loadEntities: Promise<any>;
+        this.isReady = true;
+        this.teachersCount = Math.max((this.data.teacherIds as number[]).length, 1);
+        let loadEntities: Promise<unknown>;
         if (!this.optionsLoaded) {
             loadEntities = Promise.all([
                 this.getCabinets(),
@@ -79,7 +81,7 @@ export default class TimetableFormFragment<C extends (UpdateLessonDto | UpdatePa
 
     }
 
-    protected createEntryDto(entry: C | DTO): DTO {
+    protected createEntryDto(entry: U | C): U {
         return {
             cabinetId: entry.cabinetId,
             groupId: entry.groupId,
@@ -87,6 +89,7 @@ export default class TimetableFormFragment<C extends (UpdateLessonDto | UpdatePa
             subjectId: entry.subjectId,
             teacherIds: entry.teacherIds,
             type: entry.type,
-        } as unknown as DTO;
+            id: (entry as U).id
+        } as unknown as U;
     }
 }

@@ -1,5 +1,5 @@
 <template>
-  <div class="timetable-form__fragment timetable-form__fragment_patch" v-if="data">
+  <div class="timetable-form__fragment timetable-form__fragment_patch" v-if="isReady">
     <Form ref="form" no-submit-button>
       <div class="timetable-form__fields">
         <Field name="subjectId" label="Предмет">
@@ -84,10 +84,10 @@ export default class PatchesFormFragment extends TimetableFormFragment<UpdatePat
   @editor.State(state => state) editor!: EditorState;
 
   get canDeleteDate() {
-    return this.data && this.data.dates.length > 1;
+    return this.data && (this.data.dates as string[]).length > 1;
   }
 
-  protected createEntryDto(entry: CreatePatchDto): CreatePatchDto {
+  protected createEntryDto(entry: UpdatePatchDto): UpdatePatchDto {
     return {
       cabinetId: entry.cabinetId,
       groupId: entry.groupId,
@@ -95,7 +95,8 @@ export default class PatchesFormFragment extends TimetableFormFragment<UpdatePat
       subjectId: entry.subjectId,
       teacherIds: entry.teacherIds,
       type: entry.type,
-      dates: entry.dates
+      dates: entry.dates,
+      id: entry.id,
     };
   }
 
@@ -114,14 +115,14 @@ export default class PatchesFormFragment extends TimetableFormFragment<UpdatePat
 
   addDate() {
     if (this.data) {
-      this.data.dates.push((new Date()).toISOString());
+      (this.data.dates as string[]).push((new Date()).toISOString());
     }
   }
 
   removeDate(date: string) {
     if (this.data && this.canDeleteDate) {
-      const dateIndex = this.data.dates.findIndex(d => d === date);
-      this.data.dates.splice(dateIndex, 1);
+      const dateIndex = (this.data.dates as string[]).findIndex(d => d === date);
+      (this.data.dates as string[]).splice(dateIndex, 1);
     }
   }
 

@@ -53,14 +53,14 @@ import {api} from "@/api";
 const editor = namespace('editor');
 @Component({
   name: 'RegularEntryForm',
-  components: { Form, Field, Select, ListBox, DayPicker, WeekPicker, Button }
+  components: {Form, Field, Select, ListBox, DayPicker, WeekPicker, Button}
 })
 export default class RegularEntryForm extends TimetableFormFragment<UpdateLessonDto, CreateLessonDto> implements LessonHolder {
   /**
    * use this prop to provide index for the entry from the outside (TimetableForm)
    * @see RegularEntryForm#getLesson
    */
-  @Prop({ required: true }) index!: number;
+  @Prop({required: true}) index!: number;
   @editor.State(state => state) editor!: EditorState;
 
   getLesson(): CreateLessonDto {
@@ -84,13 +84,13 @@ export default class RegularEntryForm extends TimetableFormFragment<UpdateLesson
       return api.timetable.update((this.data as UpdateLessonDto).id as number, this.data as UpdateLessonDto)
     }
     return api.timetable.create(lesson)
-      .then(created => {
-        // update id to prevent creating the same lesson multiple times
-        (this.data as UpdateLessonDto).id = created.id;
-      });
+        .then(created => {
+          // update id to prevent creating the same lesson multiple times
+          (this.data as UpdateLessonDto).id = created.id;
+        });
   }
 
-  protected createEntryDto(entry: CreateLessonDto): CreateLessonDto {
+  protected createEntryDto(entry: UpdateLessonDto): UpdateLessonDto {
     return {
       cabinetId: entry.cabinetId,
       day: entry.day,
@@ -99,7 +99,8 @@ export default class RegularEntryForm extends TimetableFormFragment<UpdateLesson
       subjectId: entry.subjectId,
       teacherIds: entry.teacherIds,
       type: entry.type,
-      week: entry.week
+      week: entry.week,
+      id: entry.id,
     }
   }
 }
