@@ -56,8 +56,9 @@
 </template>
 
 <script lang="ts">
-import {Component, Prop} from 'vue-property-decorator';
-import {CreatePatchDto, UpdatePatchDto} from 'ggtu-timetable-api-client';
+import { Component, Prop } from 'vue-property-decorator';
+import { CreatePatchDto, UpdatePatchDto } from 'ggtu-timetable-api-client';
+import { LessonType } from 'ggtu-timetable-api-client';
 import Form from '../../components/forms/Form.vue';
 import Field from '../../components/forms/Field.vue';
 import Select from '../../components/forms/Select.vue';
@@ -65,11 +66,12 @@ import ListBox from '@/components/forms/ListBox.vue';
 import DayPicker from '@/components/timetable/DayPicker.vue';
 import Button from '@/components/common/Button.vue';
 import WeekPicker from '@/components/timetable/WeekPicker.vue';
-import {LessonHolder} from '@/utils/timetables';
+import { LessonHolder } from '@/utils/timetables';
 import TimetableFormFragment from '@/mixins/TimetableFormFragment';
-import {api} from '@/api';
-import {namespace} from "vuex-class";
-import {EditorState} from "@/store/editor/types";
+import { namespace } from 'vuex-class';
+import { EditorState } from '@/store/editor/types';
+import { UPDATE_PATCH } from '@/store/editor/action-types';
+import { ADD_PATCH } from '@/store/editor/action-types';
 
 const editor = namespace('editor');
 @Component({
@@ -83,27 +85,29 @@ export default class PatchForm extends TimetableFormFragment<UpdatePatchDto, Cre
   data!: UpdatePatchDto;
 
   @editor.State(state => state) editor!: EditorState;
+  @editor.Action(UPDATE_PATCH) updatePatch!: (patch: UpdatePatchDto) => Promise<void>;
+  @editor.Action(ADD_PATCH) addPatch!: (patch: CreatePatchDto) => Promise<void>;
 
   get canDeleteDate() {
     return (this.data.dates as string[]).length > 1;
   }
 
-  protected createEntryDto(entry: UpdatePatchDto): UpdatePatchDto {
+  protected createEntryDto(entry: UpdatePatchDto = {}): UpdatePatchDto {
     return {
-      cabinetId: entry.cabinetId,
-      groupId: entry.groupId,
-      index: entry.index,
-      subjectId: entry.subjectId,
-      teacherIds: entry.teacherIds,
-      type: entry.type,
-      dates: entry.dates,
+      cabinetId: entry.cabinetId || 0,
+      groupId: entry.groupId || 0,
+      index: entry.index || 0,
+      subjectId: entry.subjectId || 0,
+      teacherIds: entry.teacherIds || [],
+      type: entry.type || LessonType.Lecture,
+      dates: entry.dates || [new Date().toISOString()],
       id: entry.id,
     };
   }
 
-  getLesson(): CreatePatchDto {
+  getLesson(): CreatePatchDto | UpdatePatchDto {
     const data = this.form.getFormData();
-    return {
+    const lesson = {
       groupId: this.editor.groupId,
       cabinetId: data.cabinetId,
       subjectId: data.subjectId,
@@ -112,6 +116,12 @@ export default class PatchForm extends TimetableFormFragment<UpdatePatchDto, Cre
       index: data.index - 1,
       dates: data.dates,
     };
+    if (this.entry) {
+      (lesson as UpdatePatchDto).id = this.entry.id;
+      return lesson as UpdatePatchDto;
+    } else {
+      return lesson as CreatePatchDto;
+    }
   }
 
   addDate() {
@@ -127,14 +137,11 @@ export default class PatchForm extends TimetableFormFragment<UpdatePatchDto, Cre
 
   saveLesson() {
     const lesson = this.getLesson();
-    if (this.data.id) {
-      return api.patches.update(this.data.id as number, this.data)
+    if ((lesson as UpdatePatchDto).id) {
+      return this.updatePatch(lesson);
+    } else {
+      return this.addPatch(lesson as CreatePatchDto);
     }
-    return api.patches.create(lesson)
-        .then(created => {
-          // update id to prevent creating the same lesson multiple times
-          this.data.id = created.id;
-        });
   }
 }
 </script>

@@ -20,7 +20,7 @@ export default [
     {
         name: 'AddPatchForGroup',
         path: '/patches/add/:groupId',
-        component: () => import(/* webpackChunkName: "patchesForm" */'../views/timetables/PatchesView.vue'),
+        component: () => import(/* webpackChunkName: "patchesForm" */'../views/timetables/CreatePatch.vue'),
         meta: {
             private: true
         }
