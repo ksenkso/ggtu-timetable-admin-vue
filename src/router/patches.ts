@@ -4,7 +4,7 @@ export default [
     {
         path: '/patches/:groupId',
         name: 'PatchesForm',
-        component: () => import(/* webpackChunkName: "patchesForm" */'../views/timetables/PatchesForm.vue'),
+        component: () => import(/* webpackChunkName: "patchesForm" */'../views/timetables/PatchesView.vue'),
         meta: {
             private: true
         }
@@ -12,7 +12,7 @@ export default [
     {
         name: 'EditPatch',
         path: '/patches/edit/:id',
-        component: () => import(/* webpackChunkName: "patchesForm" */'../views/timetables/PatchesForm.vue'),
+        component: () => import(/* webpackChunkName: "patchesForm" */'../views/timetables/PatchesView.vue'),
         meta: {
             private: true
         }
@@ -20,7 +20,7 @@ export default [
     {
         name: 'AddPatchForGroup',
         path: '/patches/add/:groupId',
-        component: () => import(/* webpackChunkName: "patchesForm" */'../views/timetables/PatchesForm.vue'),
+        component: () => import(/* webpackChunkName: "patchesForm" */'../views/timetables/PatchesView.vue'),
         meta: {
             private: true
         }

@@ -59,8 +59,8 @@ Component.registerHooks([
 ]);
 
 @Component({
-  name: 'RegularTimetable',
-  components: {Page, PatchesFormFragment},
+  name: 'PatchesView',
+  components: { Page, PatchesFormFragment },
   filters: {
     cabinetName(cabinet: Cabinet) {
       return cabinet.building
@@ -69,7 +69,7 @@ Component.registerHooks([
     }
   }
 })
-export default class PatchesForm extends Vue {
+export default class PatchesView extends Vue {
 
   patches: (Patch | UpdatePatchDto)[] = [];
   group: Group | null = null;
@@ -133,12 +133,12 @@ export default class PatchesForm extends Vue {
       next((vm: Vue) => {
         api.groups.get(+to.params.groupId)
             .then(group => {
-              (vm as PatchesForm).group = group;
+              (vm as PatchesView).group = group;
             })
         api.patches.getForGroup(+to.params.groupId)
             .then(patches => {
-              (vm as PatchesForm).patches = patchesAdapter(patches);
-              (vm as PatchesForm).isLoading = false;
+              (vm as PatchesView).patches = patchesAdapter(patches);
+              (vm as PatchesView).isLoading = false;
             })
       })
     }
