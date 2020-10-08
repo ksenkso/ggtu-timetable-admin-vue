@@ -43,6 +43,7 @@ export default {
   text-decoration: none
   line-height: 1.6
   white-space: nowrap
+  text-align: center
 
   &[disabled]
     filter: grayscale(70%)
