@@ -32,7 +32,8 @@ export default {
 <style lang="sass">
 @import "../../assets/functions"
 .button
-  border: 1px solid theme-color("dark")
+  //border: 1px solid theme-color("dark")
+  display: inline-block
   padding: 6px 12px
   border-radius: 3px
   background-color: #fff
@@ -58,6 +59,7 @@ export default {
         outline-color: scale-color($color, $lightness: 30%)
         @if($mod == "light")
           border: 1px solid theme-color("gray")
+          padding: 5px 12px
 
 
 </style>
