@@ -56,9 +56,8 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop } from 'vue-property-decorator';
-import { CreatePatchDto, UpdatePatchDto } from 'ggtu-timetable-api-client';
-import { LessonType } from 'ggtu-timetable-api-client';
+import {Component} from 'vue-property-decorator';
+import {CreatePatchDto, LessonType, Patch, UpdatePatchDto} from 'ggtu-timetable-api-client';
 import Form from '../../components/forms/Form.vue';
 import Field from '../../components/forms/Field.vue';
 import Select from '../../components/forms/Select.vue';
@@ -66,23 +65,20 @@ import ListBox from '@/components/forms/ListBox.vue';
 import DayPicker from '@/components/timetable/DayPicker.vue';
 import Button from '@/components/common/Button.vue';
 import WeekPicker from '@/components/timetable/WeekPicker.vue';
-import { LessonHolder } from '@/utils/timetables';
+import {LessonHolder} from '@/utils/timetables';
 import TimetableFormFragment from '@/mixins/TimetableFormFragment';
-import { namespace } from 'vuex-class';
-import { EditorState } from '@/store/editor/types';
-import { UPDATE_PATCH } from '@/store/editor/action-types';
-import { ADD_PATCH } from '@/store/editor/action-types';
+import {namespace} from 'vuex-class';
+import {EditorState} from '@/store/editor/types';
+import {ADD_PATCH, UPDATE_PATCH} from '@/store/editor/action-types';
 
 const editor = namespace('editor');
 @Component({
-  name: 'PatchesFormFragment',
+  name: 'PatchForm',
   components: { Form, Field, Select, ListBox, DayPicker, WeekPicker, Button }
 })
-export default class PatchForm extends TimetableFormFragment<UpdatePatchDto, CreatePatchDto> implements LessonHolder {
+export default class PatchForm extends TimetableFormFragment<Patch, CreatePatchDto> implements LessonHolder {
 
-  @Prop({ required: true }) groupId!: number;
-  @Prop() lessonId?: number;
-  data!: UpdatePatchDto;
+  data!: CreatePatchDto;
 
   @editor.State(state => state) editor!: EditorState;
   @editor.Action(UPDATE_PATCH) updatePatch!: (patch: UpdatePatchDto) => Promise<void>;
@@ -92,16 +88,16 @@ export default class PatchForm extends TimetableFormFragment<UpdatePatchDto, Cre
     return (this.data.dates as string[]).length > 1;
   }
 
-  protected createEntryDto(entry: UpdatePatchDto = {}): UpdatePatchDto {
+  protected createEntryDto(entry: Patch = {} as Patch): CreatePatchDto {
+    console.log('entry: ', entry.groupId);
     return {
       cabinetId: entry.cabinetId || 0,
       groupId: entry.groupId || 0,
       index: entry.index || 0,
       subjectId: entry.subjectId || 0,
-      teacherIds: entry.teacherIds || [],
+      teacherIds: (entry.teachers || []).map(teacher => teacher.id),
       type: entry.type || LessonType.Lecture,
       dates: entry.dates || [new Date().toISOString()],
-      id: entry.id,
     };
   }
 
@@ -114,7 +110,7 @@ export default class PatchForm extends TimetableFormFragment<UpdatePatchDto, Cre
       teacherIds: Array.isArray(data.teacherIds) ? data.teacherIds : [data.teacherIds],
       type: data.type,
       index: data.index - 1,
-      dates: data.dates,
+      dates: Array.isArray(data.dates) ? data.dates.map((date: string) => new Date(date).toISOString()) : [new Date(data.dates).toISOString()],
     };
     if (this.entry) {
       (lesson as UpdatePatchDto).id = this.entry.id;
@@ -137,11 +133,12 @@ export default class PatchForm extends TimetableFormFragment<UpdatePatchDto, Cre
 
   saveLesson() {
     const lesson = this.getLesson();
-    if ((lesson as UpdatePatchDto).id) {
+    this.$emit('submit', lesson);
+    /*if ((lesson as UpdatePatchDto).id) {
       return this.updatePatch(lesson);
     } else {
       return this.addPatch(lesson as CreatePatchDto);
-    }
+    }*/
   }
 }
 </script>

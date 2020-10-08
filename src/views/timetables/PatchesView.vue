@@ -1,5 +1,6 @@
 <template>
   <Page :title="title">
+    <router-link class="button button_theme-primary" :to="addPatchLink">Добавить изменение</router-link>
     <div class="patches">
       <div class="patch" v-for="entry in patches" :key="entry.id">
         <div class="patch__container">
@@ -21,6 +22,9 @@
           </div>
           <div class="patch__dates">
             <div class="patch__row">
+              <h3>Пара {{entry.patch.index + 1}}</h3>
+            </div>
+            <div class="patch__row">
               <h3>Даты</h3>
               <div class="patch__date" v-for="date in entry.patch.dates" :key="date">{{ date }}</div>
             </div>
@@ -34,7 +38,6 @@
         </div>
       </div>
     </div>
-    <router-link class="button button_theme-primary" :to="addPatchLink">Добавить изменение</router-link>
   </Page>
 </template>
 
@@ -45,16 +48,11 @@ import { NavigationGuardNext, Route } from 'vue-router';
 import { Location } from 'vue-router';
 import { Cabinet, Group, Patch } from 'ggtu-timetable-api-client';
 import PatchForm from '@/views/timetables/PatchForm.vue';
-import { GET_GROUP } from '@/store/editor/action-types';
+import {GET_GROUP, REMOVE_PATCH} from '@/store/editor/action-types';
 import { GET_PATCHES } from '@/store/editor/action-types';
 import { namespace } from 'vuex-class';
 
 const editor = namespace('editor');
-
-function patchesAdapter(patches: Patch[]): Patch[] {
-  // patches.reduce((date))
-  return patches;
-}
 
 Component.registerHooks([
   'beforeRouteEnter',
@@ -76,6 +74,7 @@ export default class PatchesView extends Vue {
   @editor.State('patches') patches!: { id: string; patch: Patch }[];
   @editor.Action(GET_PATCHES) getPatches!: (groupId: number) => Promise<void>;
   @editor.Action(GET_GROUP) getGroup!: (groupId: number) => Promise<void>;
+  @editor.Action(REMOVE_PATCH) removePatch!: (patchId: number) => Promise<void>;
   @editor.State('group') group?: Group;
   isLoading = true;
 
@@ -102,15 +101,9 @@ export default class PatchesView extends Vue {
   tryRemovePatch(patchId: number) {
     const shouldDelete = confirm('Отменить изменение?');
     if (shouldDelete) {
-      console.log(patchId);
+      this.removePatch(patchId);
     }
   }
-
-
-  addPatch() {
-    // this.patches.push(this.createPatch())
-  }
-
 
   beforeRouteEnter(to: Route, from: Route, next: NavigationGuardNext) {
     if (!to.params.groupId) {
@@ -132,7 +125,7 @@ export default class PatchesView extends Vue {
   display: flex
   flex-direction: column
   row-gap: 1rem
-  margin-bottom: 1rem
+  margin-top: 1rem
 
 .patch
   padding: 2em 1em

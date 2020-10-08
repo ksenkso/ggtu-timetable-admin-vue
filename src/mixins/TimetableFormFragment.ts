@@ -1,17 +1,17 @@
-import { Component, Prop, Ref, Vue } from 'vue-property-decorator';
-import { Cabinet, CreateLessonDto, CreatePatchDto, UpdateLessonDto, UpdatePatchDto } from 'ggtu-timetable-api-client';
+import {Component, Prop, Ref, Vue} from 'vue-property-decorator';
+import {Cabinet, Lesson, Patch, UpdateLessonDto, UpdatePatchDto} from 'ggtu-timetable-api-client';
 import Form from '../components/forms/Form.vue';
 import Field from '../components/forms/Field.vue';
 import Select from '../components/forms/Select.vue';
 import ListBox from '@/components/forms/ListBox.vue';
-import { cabinetsAdapter, defaultEntityAdapter, SelectOption } from '@/utils/lists';
+import {cabinetsAdapter, defaultEntityAdapter, SelectOption} from '@/utils/lists';
 import DayPicker from '@/components/timetable/DayPicker.vue';
 import Button from '@/components/common/Button.vue';
 import WeekPicker from '@/components/timetable/WeekPicker.vue';
-import { NamedEntity, NamedEntityDict } from '@/store/entities/types';
-import { namespace } from 'vuex-class';
-import { Dictionary } from 'vue-router/types/router';
-import { GET_ALL_ENTITIES } from '@/store/entities/action-types';
+import {NamedEntity, NamedEntityDict} from '@/store/entities/types';
+import {namespace} from 'vuex-class';
+import {Dictionary} from 'vue-router/types/router';
+import {GET_ALL_ENTITIES} from '@/store/entities/action-types';
 
 const cabinets = namespace('cabinets');
 const teachers = namespace('teachers');
@@ -21,9 +21,9 @@ const lessons = namespace('subjects');
     name: 'TimetableFormFragment',
     components: { Form, Field, Select, ListBox, DayPicker, WeekPicker, Button }
 })
-export default class TimetableFormFragment<U extends (UpdateLessonDto | UpdatePatchDto), C extends (CreateLessonDto | CreatePatchDto)> extends Vue {
+export default class TimetableFormFragment<T extends (Lesson | Patch), U extends (UpdateLessonDto | UpdatePatchDto)> extends Vue {
 
-    @Prop() entry?: U;
+    @Prop() entry?: T;
     @cabinets.Action(GET_ALL_ENTITIES) getCabinets!: () => Promise<void>;
     @teachers.Action(GET_ALL_ENTITIES) getTeachers!: () => Promise<void>;
     @lessons.Action(GET_ALL_ENTITIES) getLessons!: () => Promise<void>;
@@ -81,15 +81,15 @@ export default class TimetableFormFragment<U extends (UpdateLessonDto | UpdatePa
 
     }
 
-    protected createEntryDto(entry: U | C = {} as U | C): U {
+    protected createEntryDto(entry: T = {} as T): U {
         return {
             cabinetId: entry.cabinetId,
             groupId: entry.groupId,
             index: entry.index,
             subjectId: entry.subjectId,
-            teacherIds: entry.teacherIds,
+            teacherIds: entry.teachers.map(teacher => teacher.id),
             type: entry.type,
-            id: (entry as U).id
+            id: entry.id
         } as unknown as U;
     }
 }

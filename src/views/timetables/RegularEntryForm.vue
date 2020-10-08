@@ -36,7 +36,7 @@
 
 <script lang="ts">
 import {Component, Prop} from 'vue-property-decorator';
-import {CreateLessonDto, UpdateLessonDto} from 'ggtu-timetable-api-client';
+import {CreateLessonDto, Day, Lesson, LessonType, UpdateLessonDto, Week} from 'ggtu-timetable-api-client';
 import Form from '../../components/forms/Form.vue';
 import Field from '../../components/forms/Field.vue';
 import Select from '../../components/forms/Select.vue';
@@ -55,7 +55,7 @@ const editor = namespace('editor');
   name: 'RegularEntryForm',
   components: {Form, Field, Select, ListBox, DayPicker, WeekPicker, Button}
 })
-export default class RegularEntryForm extends TimetableFormFragment<UpdateLessonDto, CreateLessonDto> implements LessonHolder {
+export default class RegularEntryForm extends TimetableFormFragment<Lesson, CreateLessonDto> implements LessonHolder {
   /**
    * use this prop to provide index for the entry from the outside (TimetableForm)
    * @see RegularEntryForm#getLesson
@@ -90,17 +90,16 @@ export default class RegularEntryForm extends TimetableFormFragment<UpdateLesson
         });
   }
 
-  protected createEntryDto(entry: UpdateLessonDto): UpdateLessonDto {
+  protected createEntryDto(entry: Lesson): CreateLessonDto {
     return {
-      cabinetId: entry.cabinetId,
-      day: entry.day,
-      groupId: entry.groupId,
-      index: entry.index,
-      subjectId: entry.subjectId,
-      teacherIds: entry.teacherIds,
-      type: entry.type,
-      week: entry.week,
-      id: entry.id,
+      cabinetId: entry.cabinetId || 0,
+      groupId: entry.groupId || 0,
+      index: entry.index || 0,
+      subjectId: entry.subjectId || 0,
+      teacherIds: entry.teachers.map(teacher => teacher.id) || [],
+      type: entry.type || LessonType.Lecture,
+      week: entry.week || Week.Top,
+      day: entry.day || Day.Monday,
     }
   }
 }

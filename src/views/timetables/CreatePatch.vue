@@ -1,21 +1,17 @@
 <template>
   <Page :title="title">
-    <PatchForm :group-id="groupId"></PatchForm>
+    <PatchForm @submit="saveLesson" :group-id="groupId"></PatchForm>
   </Page>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import {Component, Vue} from 'vue-property-decorator';
 import Page from '../Page.vue';
 import PatchForm from '@/views/timetables/PatchForm.vue';
-import { namespace } from 'vuex-class';
-import { Group } from 'ggtu-timetable-api-client';
-import { Patch } from 'ggtu-timetable-api-client';
-import { UpdatePatchDto } from 'ggtu-timetable-api-client';
-import { UPDATE_PATCH } from '@/store/editor/action-types';
-import { GET_GROUP } from '@/store/editor/action-types';
-import { Route } from 'vue-router';
-import { NavigationGuardNext } from 'vue-router';
+import {namespace} from 'vuex-class';
+import {CreatePatchDto, Group, Patch} from 'ggtu-timetable-api-client';
+import {ADD_PATCH, GET_GROUP} from '@/store/editor/action-types';
+import {NavigationGuardNext, Route} from 'vue-router';
 
 const editor = namespace('editor');
 
@@ -25,13 +21,13 @@ Component.registerHooks([
 
 @Component({
   name: 'CreatePatch',
-  components: { Page, PatchForm }
+  components: {Page, PatchForm}
 })
 export default class CreatePatch extends Vue {
 
   @editor.State('groupId') groupId!: number;
   @editor.Action(GET_GROUP) getGroup!: (groupId: number) => Promise<void>;
-  @editor.Action(UPDATE_PATCH) updatePatch!: (patch: UpdatePatchDto) => Promise<void>
+  @editor.Action(ADD_PATCH) createPatch!: (patch: CreatePatchDto) => Promise<void>
   @editor.State('patches') patches!: { id: string; patch: Patch }[];
   @editor.State('group') group?: Group;
   isLoading = true;
@@ -45,6 +41,14 @@ export default class CreatePatch extends Vue {
       title += '. Загрузка...'
     }
     return title;
+  }
+
+  saveLesson(data: CreatePatchDto) {
+    console.log(data);
+    this.createPatch(data)
+        .then(() => {
+          this.$router.push({name: 'PatchesView', params: {groupId: this.groupId.toString()}})
+        })
   }
 
   beforeRouteEnter(to: Route, from: Route, next: NavigationGuardNext) {

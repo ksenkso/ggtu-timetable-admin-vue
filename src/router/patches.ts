@@ -3,8 +3,8 @@ import { RouteConfig } from 'vue-router';
 export default [
     {
         path: '/patches/:groupId',
-        name: 'PatchesForm',
-        component: () => import(/* webpackChunkName: "patchesForm" */'../views/timetables/PatchesView.vue'),
+        name: 'PatchesView',
+        component: () => import(/* webpackChunkName: "patchesView" */'../views/timetables/PatchesView.vue'),
         meta: {
             private: true
         }
@@ -12,7 +12,7 @@ export default [
     {
         name: 'EditPatch',
         path: '/patches/edit/:id',
-        component: () => import(/* webpackChunkName: "patchesForm" */'../views/timetables/PatchesView.vue'),
+        component: () => import(/* webpackChunkName: "patchesEdit" */'../views/timetables/EditPatch.vue'),
         meta: {
             private: true
         }
@@ -20,7 +20,7 @@ export default [
     {
         name: 'AddPatchForGroup',
         path: '/patches/add/:groupId',
-        component: () => import(/* webpackChunkName: "patchesForm" */'../views/timetables/CreatePatch.vue'),
+        component: () => import(/* webpackChunkName: "patchesCreate" */'../views/timetables/CreatePatch.vue'),
         meta: {
             private: true
         }
