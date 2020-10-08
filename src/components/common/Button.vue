@@ -42,6 +42,7 @@ export default {
   transition: filter .1s ease-in-out
   text-decoration: none
   line-height: 1.6
+  white-space: nowrap
 
   &[disabled]
     filter: grayscale(70%)
