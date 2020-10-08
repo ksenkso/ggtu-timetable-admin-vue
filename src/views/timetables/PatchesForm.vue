@@ -1,26 +1,42 @@
 <template>
   <Page :title="title">
-    <div class="entry" v-for="patch in patches" :key="patch.id">
-      <div class="patch">
-        <h3>Предмет</h3>
-        <div class="patch__subject">{{ patch.subject.name }}</div>
-        <div class="patch__teachers">
-          <h3>Преподаватели</h3>
-          <div class="patch__teacher" v-for="teacher in patch.teachers" :key="teacher.id">
-            {{ teacher.name }}
+    <div class="patches">
+      <div class="patch" v-for="patch in patches" :key="patch.id">
+        <div class="patch__container">
+          <div class="patch__main">
+            <div class="patch__row">
+              <h3>Предмет</h3>
+              <div class="patch__subject">{{ patch.subject.name }}</div>
+            </div>
+            <div class="patch__row">
+              <h3>Преподаватели</h3>
+              <div class="patch__teacher" v-for="teacher in patch.teachers" :key="teacher.id">
+                {{ teacher.name }}
+              </div>
+            </div>
+            <div class="patch__row">
+              <h3>Кабинеты</h3>
+              <div class="patch__cabinet">{{ patch.cabinet | cabinetName }}</div>
+            </div>
+          </div>
+          <div class="patch__dates">
+            <div class="patch__row">
+              <h3>Даты</h3>
+              <div class="patch__date" v-for="date in patch.dates" :key="date">{{ date }}</div>
+            </div>
           </div>
         </div>
-        <div class="patch__dates">
-          <h3>Даты</h3>
-          <div class="patch__date" v-for="date in patch.dates" :key="date">{{ date }}</div>
+        <div class="patch__bottom">
+          <router-link class="button button_theme-light" :to="{name: 'EditPatch', params: {id: patch.id}}">
+            Редактировать
+          </router-link>
+          <Button @click.native="tryRemovePatch(patch.id)" theme="danger">Отменить изменение</Button>
         </div>
-        <div class="patch__cabinet">{{ patch.cabinet | cabinetName }}</div>
-        <router-link :to="{name: 'EditPatch', params: {id: patch.id}}"></router-link>
-        <Button @click.native="tryRemovePatch(patch.id)" theme="danger">Отменить изменение</Button>
       </div>
-<!--      <PatchesFormFragment :entry="patch" :group-id="group.id"></PatchesFormFragment>-->
+      <!--      <PatchesFormFragment :entry="patch" :group-id="group.id"></PatchesFormFragment>-->
     </div>
-    <Button theme="primary" @click.native="addPatch">Добавить изменение</Button>
+    <!--    <Button theme="primary" @click.native="addPatch">Добавить изменение</Button>-->
+    <router-link class="button button_theme-primary" :to="addPatchLink">Добавить изменение</router-link>
   </Page>
 </template>
 
@@ -31,6 +47,7 @@ import {NavigationGuardNext, Route} from 'vue-router';
 import {api} from '@/api';
 import {Cabinet, CreatePatchDto, Group, LessonType, Patch, UpdatePatchDto} from 'ggtu-timetable-api-client';
 import PatchesFormFragment from '@/views/timetables/PatchesFormFragment.vue';
+import { Location } from 'vue-router';
 
 function patchesAdapter(patches: Patch[]): Patch[] {
   // patches.reduce((date))
@@ -57,6 +74,15 @@ export default class PatchesForm extends Vue {
   patches: (Patch | UpdatePatchDto)[] = [];
   group: Group | null = null;
   isLoading = true;
+
+  get addPatchLink(): Location {
+    return {
+      name: 'AddPatchForGroup',
+      params: {
+        groupId: this.$route.params.groupId
+      }
+    }
+  }
 
   get title(): string {
     let title = 'Изменения в расписании';
@@ -120,6 +146,50 @@ export default class PatchesForm extends Vue {
 }
 </script>
 
-<style scoped>
+<style scoped lang="sass">
+.patches
+  display: flex
+  flex-direction: column
+  row-gap: 1rem
+  margin-bottom: 1rem
+
+.patch
+  padding: 2em 1em
+  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, .13)
+  max-width: 800px
+
+  &__row
+    margin-bottom: 1rem
+
+    h3
+      margin: 0
+
+  &__container
+    display: flex
+    justify-content: space-between
+    @media (max-width: 768px)
+      flex-direction: column
+
+  &__dates
+    flex: 0 0 120px
+    @media (max-width: 768px)
+      flex: initial
+
+  &__main
+    @media (max-width: 768px)
+      order: 2
+
+  &__bottom
+    margin-top: 1rem
+    display: flex
+    column-gap: 1rem
+    justify-content: flex-end
+    @media (max-width: 768px)
+      justify-content: space-between
+    @media (max-width: 650px)
+      flex-direction: column
+      justify-content: initial
+      row-gap: 1rem
+      column-gap: 0
 
 </style>
