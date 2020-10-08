@@ -12,3 +12,4 @@ export const SET_PATCH = 'SET_PATCH';
 export const ADD_PATCH = 'ADD_PATCH';
 export const DELETE_PATCH = 'DELETE_PATCH';
 
+export const SET_GROUP = 'SET_GROUP';

@@ -74,17 +74,18 @@ import {EditorState} from "@/store/editor/types";
 const editor = namespace('editor');
 @Component({
   name: 'PatchesFormFragment',
-  components: {Form, Field, Select, ListBox, DayPicker, WeekPicker, Button}
+  components: { Form, Field, Select, ListBox, DayPicker, WeekPicker, Button }
 })
-export default class PatchesFormFragment extends TimetableFormFragment<UpdatePatchDto, CreatePatchDto> implements LessonHolder {
+export default class PatchForm extends TimetableFormFragment<UpdatePatchDto, CreatePatchDto> implements LessonHolder {
 
-  @Prop({required: true}) groupId!: number;
+  @Prop({ required: true }) groupId!: number;
   @Prop() lessonId?: number;
+  data!: UpdatePatchDto;
 
   @editor.State(state => state) editor!: EditorState;
 
   get canDeleteDate() {
-    return this.data && (this.data.dates as string[]).length > 1;
+    return (this.data.dates as string[]).length > 1;
   }
 
   protected createEntryDto(entry: UpdatePatchDto): UpdatePatchDto {
@@ -114,13 +115,11 @@ export default class PatchesFormFragment extends TimetableFormFragment<UpdatePat
   }
 
   addDate() {
-    if (this.data) {
-      (this.data.dates as string[]).push((new Date()).toISOString());
-    }
+    (this.data.dates as string[]).push((new Date()).toISOString());
   }
 
   removeDate(date: string) {
-    if (this.data && this.canDeleteDate) {
+    if (this.canDeleteDate) {
       const dateIndex = (this.data.dates as string[]).findIndex(d => d === date);
       (this.data.dates as string[]).splice(dateIndex, 1);
     }
@@ -128,13 +127,13 @@ export default class PatchesFormFragment extends TimetableFormFragment<UpdatePat
 
   saveLesson() {
     const lesson = this.getLesson();
-    if ((this.data as UpdatePatchDto).id) {
-      return api.patches.update((this.data as UpdatePatchDto).id as number, this.data as UpdatePatchDto)
+    if (this.data.id) {
+      return api.patches.update(this.data.id as number, this.data)
     }
     return api.patches.create(lesson)
         .then(created => {
           // update id to prevent creating the same lesson multiple times
-          (this.data as UpdatePatchDto).id = created.id;
+          this.data.id = created.id;
         });
   }
 }

@@ -1,4 +1,4 @@
-import {MutationTree} from "vuex";
+import { MutationTree } from 'vuex';
 import {
     ADD_PATCH,
     SET_DAY,
@@ -6,13 +6,18 @@ import {
     SET_LESSONS_FOR_WEEK, SET_PATCH,
     SET_PATCHES_FOR_WEEK,
     SET_WEEK
-} from "@/store/editor/mutations-types";
-import {Day, Lesson, Patch, Week} from "ggtu-timetable-api-client";
-import {EditorState} from "@/store/editor/types";
-import {v4} from "uuid";
-import {REMOVE_PATCH} from "@/store/editor/action-types";
+} from '@/store/editor/mutations-types';
+import { Day, Lesson, Patch, Week } from 'ggtu-timetable-api-client';
+import { EditorState } from '@/store/editor/types';
+import { v4 } from 'uuid';
+import { REMOVE_PATCH } from '@/store/editor/action-types';
+import { SET_GROUP } from '@/store/editor/mutations-types';
+import { Group } from 'ggtu-timetable-api-client';
 
 export default {
+    [SET_GROUP](state, group: Group) {
+        state.group = group;
+    },
     [SET_WEEK](state, week: Week) {
         state.week = week;
     },
@@ -22,7 +27,7 @@ export default {
     [SET_GROUP_ID](state, groupId: number) {
         state.groupId = groupId;
     },
-    [SET_LESSONS_FOR_WEEK](state, {lessons, week}: { lessons: Lesson[]; week: Week }) {
+    [SET_LESSONS_FOR_WEEK](state, { lessons, week }: { lessons: Lesson[]; week: Week }) {
         // use strings as keys because Day values may change in the future and objects have string keys anyway
         const days: Record<string, { id: string; lesson?: Lesson }[]> = {};
         lessons.reduce((days, lesson) => {

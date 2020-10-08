@@ -7,3 +7,5 @@ export const GET_PATCHES = 'GET_PATCHES';
 export const ADD_PATCH = 'ADD_PATCH';
 export const REMOVE_PATCH = 'REMOVE_PATCH';
 export const UPDATE_PATCH = 'UPDATE_PATCH';
+
+export const GET_GROUP = 'GET_GROUP';

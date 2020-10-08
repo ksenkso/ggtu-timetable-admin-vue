@@ -1,25 +1,40 @@
-import {ActionTree} from "vuex";
-import {EditorState} from "@/store/editor/types";
-import {RootState} from "@/store/types";
+import { ActionTree } from 'vuex';
+import { EditorState } from '@/store/editor/types';
+import { RootState } from '@/store/types';
 import {
     ADD_LESSON,
     ADD_PATCH,
+    GET_GROUP,
     GET_LESSONS_FOR_WEEK,
     GET_PATCHES,
     REMOVE_LESSON,
     REMOVE_PATCH,
     UPDATE_LESSON,
     UPDATE_PATCH
-} from "@/store/editor/action-types";
-import {api} from "@/api";
-import {SET_LESSON, SET_LESSONS_FOR_WEEK, SET_PATCH, SET_PATCHES_FOR_WEEK} from "@/store/editor/mutations-types";
-import {CreateLessonDto, CreatePatchDto, UpdateLessonDto, UpdatePatchDto, Week} from "ggtu-timetable-api-client";
+} from '@/store/editor/action-types';
+import { api } from '@/api';
+import {
+    SET_GROUP,
+    SET_GROUP_ID,
+    SET_LESSON,
+    SET_LESSONS_FOR_WEEK,
+    SET_PATCH,
+    SET_PATCHES_FOR_WEEK
+} from '@/store/editor/mutations-types';
+import { CreateLessonDto, CreatePatchDto, UpdateLessonDto, UpdatePatchDto, Week } from 'ggtu-timetable-api-client';
 
 export default {
-    [GET_LESSONS_FOR_WEEK](context, {groupId, week}: {groupId: number; week: Week}) {
+    [GET_GROUP](context, groupId: number) {
+        context.commit(SET_GROUP_ID, groupId);
+        return api.groups.get(groupId)
+            .then(group => {
+                context.commit(SET_GROUP, group);
+            });
+    },
+    [GET_LESSONS_FOR_WEEK](context, { groupId, week }: { groupId: number; week: Week }) {
         return api.timetable.getForGroup(groupId)
             .then(lessons => {
-                context.commit(SET_LESSONS_FOR_WEEK, {lessons, week});
+                context.commit(SET_LESSONS_FOR_WEEK, { lessons, week });
             });
     },
     [ADD_LESSON](context, lesson: CreateLessonDto) {
@@ -40,10 +55,10 @@ export default {
                 context.commit(SET_LESSON, updated);
             });
     },
-    [GET_PATCHES](context, {groupId, week}: {groupId: number; week: Week}) {
+    [GET_PATCHES](context, groupId: number) {
         return api.patches.getForGroup(groupId)
             .then(patches => {
-                context.commit(SET_PATCHES_FOR_WEEK, {patches, week});
+                context.commit(SET_PATCHES_FOR_WEEK, patches);
             });
     },
     [ADD_PATCH](context, patch: CreatePatchDto) {
