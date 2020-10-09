@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import VueRouter, {RouteConfig} from 'vue-router'
 import {api} from "@/api";
-import lessons from "./lessons";
+import subjects from "./subjects";
 import teachers from "@/router/teachers";
 import groups from "@/router/groups";
 import cabinets from "@/router/cabinets";
@@ -24,7 +24,7 @@ const routes: Array<RouteConfig> = [
     },
     ...groups,
     ...teachers,
-    ...lessons,
+    ...subjects,
     ...cabinets,
     ...buildings,
     ...timetable,

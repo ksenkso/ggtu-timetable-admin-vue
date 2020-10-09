@@ -21,7 +21,7 @@ import entityView from "@/mixins/EntityView";
 const subjects = namespace('subjects');
 
 @Component({
-  name: 'GroupView',
+  name: 'SubjectView',
   components: {Page, Form, Field}
 })
 export default class SubjectView extends entityView(subjects) {

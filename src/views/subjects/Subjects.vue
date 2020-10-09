@@ -27,7 +27,7 @@ import {AbstractDataLoader} from "@/views/cabinets/DataLoader";
 import {Store} from "vuex";
 import {RootState} from "@/store/types";
 
-const lessons = namespace('subjects');
+const subjects = namespace('subjects');
 
 class LessonsLoader extends AbstractDataLoader {
 
@@ -42,10 +42,10 @@ class LessonsLoader extends AbstractDataLoader {
 }
 
 @Component({
-  name: 'Lessons',
+  name: 'Subjects',
   components: {Page, EntityControls, EntityList}
 })
-export default class Lessons extends entityListPage(lessons, LessonsLoader) {
+export default class Subjects extends entityListPage(subjects, LessonsLoader) {
 
 }
 </script>
