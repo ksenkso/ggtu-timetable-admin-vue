@@ -22,7 +22,7 @@
           </div>
           <div class="patch__dates">
             <div class="patch__row">
-              <h3>Пара {{entry.patch.index + 1}}</h3>
+              <h3>Пара {{ entry.patch.index + 1 }}</h3>
             </div>
             <div class="patch__row">
               <h3>Даты</h3>
@@ -42,15 +42,12 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import {Component, Vue} from 'vue-property-decorator';
 import Page from '../Page.vue';
-import { NavigationGuardNext, Route } from 'vue-router';
-import { Location } from 'vue-router';
-import { Cabinet, Group, Patch } from 'ggtu-timetable-api-client';
-import PatchForm from '@/views/timetables/PatchForm.vue';
-import {GET_GROUP, REMOVE_PATCH} from '@/store/editor/action-types';
-import { GET_PATCHES } from '@/store/editor/action-types';
-import { namespace } from 'vuex-class';
+import {Location, NavigationGuardNext, Route} from 'vue-router';
+import {Group, Patch} from 'ggtu-timetable-api-client';
+import {GET_GROUP, GET_PATCHES, REMOVE_PATCH} from '@/store/editor/action-types';
+import {namespace} from 'vuex-class';
 
 const editor = namespace('editor');
 
@@ -60,14 +57,7 @@ Component.registerHooks([
 
 @Component({
   name: 'PatchesView',
-  components: { Page, PatchesFormFragment: PatchForm },
-  filters: {
-    cabinetName(cabinet: Cabinet) {
-      return cabinet.building
-          ? cabinet.building.name + ', ' + cabinet.name
-          : cabinet.name;
-    }
-  }
+  components: {Page}
 })
 export default class PatchesView extends Vue {
 
@@ -111,6 +101,7 @@ export default class PatchesView extends Vue {
     } else {
       next((vm: Vue) => {
         const instance = vm as PatchesView;
+        instance.isLoading = true;
         instance.getGroup(+to.params.groupId)
             .then(() => instance.getPatches(+to.params.groupId))
             .then(() => instance.isLoading = false);
