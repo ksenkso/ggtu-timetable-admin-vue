@@ -1,6 +1,7 @@
 <template>
   <Page :title="title">
-    <PatchForm v-if="!isLoading" @submit="saveLesson" :entry="patch" :group-id="groupId"></PatchForm>
+    <Alert v-if="notFound" theme="warning">Изменение не найдено</Alert>
+    <PatchForm v-if="!isLoading" @submit="saveLesson" lesson="patch" :group-id="groupId"></PatchForm>
   </Page>
 </template>
 
