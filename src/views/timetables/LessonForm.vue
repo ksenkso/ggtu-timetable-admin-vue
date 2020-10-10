@@ -75,7 +75,8 @@ export default class LessonForm extends TimetableFormFragment<Lesson, CreateLess
       subjectId: data.subjectId,
       teacherIds: Array.isArray(data.teacherIds) ? data.teacherIds : [data.teacherIds],
       type: data.type,
-      index: this.lesson?.index || 0
+      index: this.lesson?.index || 0,
+      id: this.lesson?.id
     };
   }
 
