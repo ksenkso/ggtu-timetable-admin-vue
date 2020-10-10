@@ -1,6 +1,10 @@
 <template>
-  <div class="timetable-form__fragment" v-if="data">
-    <Button theme="danger" @click.native="$emit('remove', index)">Убрать пару</Button>
+  <Card v-if="isReady">
+    <template slot="header">
+      Пара {{lesson.index + 1}}
+      <Button theme="danger" @click.native="$emit('remove', index)">Убрать пару</Button>
+    </template>
+
     <Form ref="form" @submit="saveLesson">
       <Field name="subjectId" label="Предмет">
         <template v-slot:input="{updateValue}">
@@ -17,6 +21,7 @@
           </Select>
         </template>
       </Field>
+      <Alert theme="danger" v-if="!data.teacherIds">ALARM</Alert>
       <Field v-for="index in teachersCount" :key="index" name="teacherIds" label="Преподаватель">
         <template v-slot:input="{updateValue}">
           <ListBox :default-value="data.teacherIds[index - 1]" @select="updateValue"
@@ -31,11 +36,11 @@
       </Field>
       <slot></slot>
     </Form>
-  </div>
+  </Card>
 </template>
 
 <script lang="ts">
-import {Component, Prop} from 'vue-property-decorator';
+import {Component} from 'vue-property-decorator';
 import {CreateLessonDto, Day, Lesson, LessonType, UpdateLessonDto, Week} from 'ggtu-timetable-api-client';
 import Form from '../../components/forms/Form.vue';
 import Field from '../../components/forms/Field.vue';
@@ -48,46 +53,30 @@ import {LessonHolder} from '@/utils/timetables';
 import TimetableFormFragment from '@/mixins/TimetableFormFragment';
 import {namespace} from "vuex-class";
 import {EditorState} from "@/store/editor/types";
-import {api} from "@/api";
+import Card from "@/components/common/Card.vue";
 
 const editor = namespace('editor');
+
 @Component({
-  name: 'RegularEntryForm',
-  components: {Form, Field, Select, ListBox, DayPicker, WeekPicker, Button}
+  name: 'LessonForm',
+  components: {Form, Field, Select, ListBox, DayPicker, WeekPicker, Button, Card}
 })
-export default class RegularEntryForm extends TimetableFormFragment<Lesson, CreateLessonDto> implements LessonHolder {
-  /**
-   * use this prop to provide index for the entry from the outside (TimetableForm)
-   * @see RegularEntryForm#getLesson
-   */
-  @Prop({required: true}) index!: number;
+export default class LessonForm extends TimetableFormFragment<Lesson, CreateLessonDto> implements LessonHolder {
+
   @editor.State(state => state) editor!: EditorState;
 
-  getLesson(): CreateLessonDto {
+  getLesson(): CreateLessonDto | UpdateLessonDto {
     const data = this.form.getFormData();
     return {
       day: this.editor.day,
       groupId: this.editor.groupId,
       week: this.editor.week,
-      // id: this.entry.id as number,
       cabinetId: data.cabinetId,
       subjectId: data.subjectId,
       teacherIds: Array.isArray(data.teacherIds) ? data.teacherIds : [data.teacherIds],
       type: data.type,
-      index: this.index
+      index: this.lesson?.index || 0
     };
-  }
-
-  saveLesson() {
-    const lesson = this.getLesson();
-    if ((this.data as UpdateLessonDto).id) {
-      return api.timetable.update((this.data as UpdateLessonDto).id as number, this.data as UpdateLessonDto)
-    }
-    return api.timetable.create(lesson)
-        .then(created => {
-          // update id to prevent creating the same lesson multiple times
-          (this.data as UpdateLessonDto).id = created.id;
-        });
   }
 
   protected createEntryDto(entry: Lesson): CreateLessonDto {
@@ -105,6 +94,8 @@ export default class RegularEntryForm extends TimetableFormFragment<Lesson, Crea
 }
 </script>
 
-<style scoped>
-
+<style scoped lang="sass">
+.button_theme-danger
+  font-size: 1rem
+  float: right
 </style>
