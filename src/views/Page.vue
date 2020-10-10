@@ -25,7 +25,7 @@ export default {
 }
 </script>
 
-<style scoped lang="sass">
+<style lang="sass">
 .page
   display: grid
   grid-template-rows: 48px 1fr
@@ -34,7 +34,8 @@ export default {
   grid-column-gap: 4px
   height: 100%
   max-height: 100%
-
+  &__shrink
+    max-width: 600px
   &__content
     grid-area: content
     padding: 1em 1.5em
