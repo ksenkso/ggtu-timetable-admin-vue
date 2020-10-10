@@ -89,7 +89,7 @@ export default class PatchForm extends TimetableFormFragment<Patch, CreatePatchD
   }
 
   protected createEntryDto(entry: Patch = {} as Patch): CreatePatchDto {
-    console.log('entry: ', entry.groupId);
+    console.log('lesson: ', entry.groupId);
     return {
       cabinetId: entry.cabinetId || 0,
       groupId: entry.groupId || 0,
@@ -112,8 +112,8 @@ export default class PatchForm extends TimetableFormFragment<Patch, CreatePatchD
       index: data.index - 1,
       dates: Array.isArray(data.dates) ? data.dates.map((date: string) => new Date(date).toISOString()) : [new Date(data.dates).toISOString()],
     };
-    if (this.entry) {
-      (lesson as UpdatePatchDto).id = this.entry.id;
+    if (this.lesson) {
+      (lesson as UpdatePatchDto).id = this.lesson.id;
       return lesson as UpdatePatchDto;
     } else {
       return lesson as CreatePatchDto;
@@ -131,15 +131,7 @@ export default class PatchForm extends TimetableFormFragment<Patch, CreatePatchD
     }
   }
 
-  saveLesson() {
-    const lesson = this.getLesson();
-    this.$emit('submit', lesson);
-    /*if ((lesson as UpdatePatchDto).id) {
-      return this.updatePatch(lesson);
-    } else {
-      return this.addPatch(lesson as CreatePatchDto);
-    }*/
-  }
+
 }
 </script>
 

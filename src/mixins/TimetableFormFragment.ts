@@ -23,7 +23,7 @@ const lessons = namespace('subjects');
 })
 export default class TimetableFormFragment<T extends (Lesson | Patch), U extends (UpdateLessonDto | UpdatePatchDto)> extends Vue {
 
-    @Prop() entry?: T;
+    @Prop() lesson?: T;
     @cabinets.Action(GET_ALL_ENTITIES) getCabinets!: () => Promise<void>;
     @teachers.Action(GET_ALL_ENTITIES) getTeachers!: () => Promise<void>;
     @lessons.Action(GET_ALL_ENTITIES) getLessons!: () => Promise<void>;
@@ -56,8 +56,17 @@ export default class TimetableFormFragment<T extends (Lesson | Patch), U extends
         this.teachersCount++;
     }
 
+    getLesson() {
+        throw new Error('getLesson() should be defined in a subclass');
+    }
+
+    saveLesson() {
+        const lesson = this.getLesson();
+        this.$emit('submit', lesson);
+    }
+
     mounted() {
-        this.data = this.createEntryDto(this.entry);
+        this.data = this.createEntryDto(this.lesson);
         this.isReady = true;
         this.teachersCount = Math.max((this.data.teacherIds as number[]).length, 1);
         let loadEntities: Promise<unknown>;
