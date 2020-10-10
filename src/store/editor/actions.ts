@@ -21,7 +21,14 @@ import {
     SET_PATCH, SET_PATCH_TO_UPDATE,
     SET_PATCHES_FOR_WEEK
 } from '@/store/editor/mutations-types';
-import { CreateLessonDto, CreatePatchDto, UpdateLessonDto, UpdatePatchDto, Week } from 'ggtu-timetable-api-client';
+import {
+    CreateLessonDto,
+    CreatePatchDto,
+    Lesson,
+    UpdateLessonDto,
+    UpdatePatchDto,
+    Week
+} from 'ggtu-timetable-api-client';
 
 export default {
     [GET_GROUP](context, groupId: number) {
@@ -43,10 +50,10 @@ export default {
                 context.commit(ADD_LESSON, created);
             });
     },
-    [REMOVE_LESSON](context, lessonId: number) {
-        return api.timetable.delete(lessonId)
+    [REMOVE_LESSON](context, lesson: Lesson) {
+        return api.timetable.delete(lesson.id)
             .then(() => {
-                context.commit(REMOVE_LESSON, lessonId);
+                context.commit(REMOVE_LESSON, lesson);
             });
     },
     [UPDATE_LESSON](context, lesson: UpdateLessonDto) {

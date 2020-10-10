@@ -5,7 +5,7 @@ export const SET_GROUP_ID = 'SET_GROUP_ID';
 export const SET_LESSONS_FOR_WEEK = 'SET_LESSONS_FOR_WEEK';
 export const SET_LESSON = 'SET_LESSON';
 export const ADD_LESSON = 'ADD_LESSON';
-export const DELETE_LESSON = 'DELETE_LESSON';
+export const REMOVE_LESSON = 'REMOVE_LESSON';
 export const SET_LESSON_TO_UPDATE = 'SET_LESSON_TO_UPDATE';
 
 export const SET_PATCHES_FOR_WEEK = 'SET_PATCHES_FOR_WEEK';

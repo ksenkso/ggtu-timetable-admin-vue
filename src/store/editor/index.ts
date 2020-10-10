@@ -22,4 +22,9 @@ export default {
     }),
     mutations,
     actions,
+    getters: {
+        currentDay(state) {
+            return state.currentTimetable[state.week][state.day];
+        }
+    }
 } as Module<EditorState, RootState>

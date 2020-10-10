@@ -1,9 +1,9 @@
 import { MutationTree } from 'vuex';
 import {
     ADD_LESSON,
-    ADD_PATCH,
+    ADD_PATCH, REMOVE_LESSON,
     SET_DAY,
-    SET_GROUP_ID, SET_LESSON_TO_UPDATE,
+    SET_GROUP_ID, SET_LESSON, SET_LESSON_TO_UPDATE,
     SET_LESSONS_FOR_WEEK, SET_PATCH, SET_PATCH_TO_UPDATE,
     SET_PATCHES_FOR_WEEK,
     SET_WEEK
@@ -77,6 +77,26 @@ export default {
     },
     [ADD_LESSON](state, lesson: Lesson) {
         state.currentTimetable[lesson.week][lesson.day].splice(lesson.index, 0, {id: v4(), lesson});
+    },
+    [SET_LESSON](state, lesson: Lesson) {
+        const day = state.currentTimetable[lesson.week][lesson.day];
+        if (day[lesson.index]) {
+            day[lesson.index].lesson = lesson
+        } else {
+            day[lesson.index] = {id: v4(), lesson};
+        }
+    },
+    [REMOVE_LESSON](state, lesson: Lesson) {
+        const day = state.currentTimetable[lesson.week][lesson.day];
+        const index = day.findIndex(l => l.lesson && l.lesson.id === lesson.id);
+        if (index !== -1) {
+            if (index === day.length - 1) {
+                day.pop();
+            } else {
+                day.splice(index, 1, {id: v4()});
+            }
+        }
+
     },
     [REMOVE_PATCH](state, patchId: number) {
         const index = state.patches.findIndex(entry => entry.patch.id === patchId);
