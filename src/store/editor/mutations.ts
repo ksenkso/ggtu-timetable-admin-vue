@@ -1,9 +1,10 @@
 import { MutationTree } from 'vuex';
 import {
+    ADD_LESSON,
     ADD_PATCH,
     SET_DAY,
-    SET_GROUP_ID,
-    SET_LESSONS_FOR_WEEK, SET_PATCH,
+    SET_GROUP_ID, SET_LESSON_TO_UPDATE,
+    SET_LESSONS_FOR_WEEK, SET_PATCH, SET_PATCH_TO_UPDATE,
     SET_PATCHES_FOR_WEEK,
     SET_WEEK
 } from '@/store/editor/mutations-types';
@@ -29,7 +30,14 @@ export default {
     },
     [SET_LESSONS_FOR_WEEK](state, { lessons, week }: { lessons: Lesson[]; week: Week }) {
         // use strings as keys because Day values may change in the future and objects have string keys anyway
-        const days: Record<string, { id: string; lesson?: Lesson }[]> = {};
+        const days: Record<string, { id: string; lesson?: Lesson }[]> = {
+            [Day.Monday]: [],
+            [Day.Tuesday]: [],
+            [Day.Wednesday]: [],
+            [Day.Thursday]: [],
+            [Day.Friday]: [],
+            [Day.Saturday]: [],
+        };
         lessons.reduce((days, lesson) => {
             days[lesson.day].push({
                 id: v4(),
@@ -44,7 +52,7 @@ export default {
             const day = days[dayIndex];
             day.sort((a, b) => (a.lesson as Lesson).index - (b.lesson as Lesson).index);
             /**
-             * The main idea: go through lessons, if lesson's index is not equal to expected lesson index,
+             * The main idea: go through subjects, if lesson's index is not equal to expected lesson index,
              * then there is no lesson defined, so only set an id;
              * increment expected index every iteration, go to next lesson only if indices are equal.
              */
@@ -67,6 +75,9 @@ export default {
     [ADD_PATCH](state, patch: Patch) {
         state.patches.push({id: v4(), patch})
     },
+    [ADD_LESSON](state, lesson: Lesson) {
+        state.currentTimetable[lesson.week][lesson.day].splice(lesson.index, 0, {id: v4(), lesson});
+    },
     [REMOVE_PATCH](state, patchId: number) {
         const index = state.patches.findIndex(entry => entry.patch.id === patchId);
         if (index !== -1) {
@@ -78,5 +89,11 @@ export default {
         if (index !== -1) {
             state.patches[index].patch = patch
         }
+    },
+    [SET_PATCH_TO_UPDATE](state, patch: Patch) {
+        state.patchToUpdate = patch;
+    },
+    [SET_LESSON_TO_UPDATE](state, lesson: Lesson) {
+        state.lessonToUpdate = lesson;
     }
 } as MutationTree<EditorState>

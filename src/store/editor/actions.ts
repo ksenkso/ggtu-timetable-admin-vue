@@ -6,7 +6,7 @@ import {
     ADD_PATCH,
     GET_GROUP,
     GET_LESSONS_FOR_WEEK,
-    GET_PATCHES,
+    GET_PATCHES, LOAD_LESSON, LOAD_PATCH,
     REMOVE_LESSON,
     REMOVE_PATCH,
     UPDATE_LESSON,
@@ -16,9 +16,9 @@ import { api } from '@/api';
 import {
     SET_GROUP,
     SET_GROUP_ID,
-    SET_LESSON,
+    SET_LESSON, SET_LESSON_TO_UPDATE,
     SET_LESSONS_FOR_WEEK,
-    SET_PATCH,
+    SET_PATCH, SET_PATCH_TO_UPDATE,
     SET_PATCHES_FOR_WEEK
 } from '@/store/editor/mutations-types';
 import { CreateLessonDto, CreatePatchDto, UpdateLessonDto, UpdatePatchDto, Week } from 'ggtu-timetable-api-client';
@@ -32,7 +32,7 @@ export default {
             });
     },
     [GET_LESSONS_FOR_WEEK](context, { groupId, week }: { groupId: number; week: Week }) {
-        return api.timetable.getForGroup(groupId)
+        return api.timetable.getForGroupByWeek(groupId, week)
             .then(lessons => {
                 context.commit(SET_LESSONS_FOR_WEEK, { lessons, week });
             });
@@ -79,4 +79,16 @@ export default {
                 context.commit(SET_PATCH, updated);
             });
     },
+    [LOAD_PATCH](context, patchId: number) {
+        return api.patches.get(patchId)
+            .then(patch => {
+                context.commit(SET_PATCH_TO_UPDATE, patch)
+            })
+    },
+    [LOAD_LESSON](context, lessonId: number) {
+        return api.patches.get(lessonId)
+            .then(lesson => {
+                context.commit(SET_LESSON_TO_UPDATE, lesson)
+            })
+    }
 } as ActionTree<EditorState, RootState>
