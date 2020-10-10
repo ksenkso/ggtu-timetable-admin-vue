@@ -7,6 +7,8 @@
       <p>
         {{ lesson.subject.name }}
         <br>
+        {{lesson.type | lessonType}}
+        <br>
         {{ lesson.cabinet | cabinetName }}
       </p>
     </div>
@@ -21,9 +23,7 @@
       </ul>
     </div>
     <template slot="footer">
-      <router-link @click.native="edit" :to="{name: 'EditLesson', params: {id: lesson.id}}"
-                   class="button button_theme-light">Редактировать
-      </router-link>
+      <Button @click.native="edit" theme="light">Редактировать</Button>
       <Button @click.native="tryRemoveLesson" theme="danger">Удалить</Button>
     </template>
   </Card>
@@ -35,6 +35,7 @@ import {Lesson} from "ggtu-timetable-api-client";
 import Card from "@/components/common/Card.vue";
 import {SET_LESSON_TO_UPDATE} from "@/store/editor/mutations-types";
 import {namespace} from "vuex-class";
+import {REMOVE_LESSON} from "@/store/editor/action-types";
 
 const editor = namespace('editor')
 
@@ -45,16 +46,18 @@ const editor = namespace('editor')
 export default class LessonView extends Vue {
   @Prop({required: true}) lesson!: Lesson;
   @editor.Mutation(SET_LESSON_TO_UPDATE) setLesson!: (lesson: Lesson) => void;
+  @editor.Action(REMOVE_LESSON) removeLesson!: (lesson: Lesson) => Promise<void>;
   @editor.State('lessonToUpdate') toUpdate!: Lesson | null;
 
   edit() {
-    console.log('move');
     this.setLesson(this.lesson)
-    console.log(this.toUpdate);
   }
 
   tryRemoveLesson() {
-    console.log('remove')
+    const shouldRemove = confirm(`Удалить пару ${this.lesson.index + 1}?`);
+    if (shouldRemove) {
+      this.removeLesson(this.lesson);
+    }
   }
 }
 </script>
