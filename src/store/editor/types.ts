@@ -1,12 +1,11 @@
-import {Day, Lesson, Patch, Week} from 'ggtu-timetable-api-client';
-import {Group} from 'ggtu-timetable-api-client';
+import {Day, Group, Lesson, Patch, Week} from 'ggtu-timetable-api-client';
 
 export type KeyedObjectMaybe<K extends string, V> = { [key in K]?: V } & { id: string }
 export type KeyedObject<K extends string, V> = { [key in K]: V } & { id: string };
-
+export type TimetableWeek = Record<string, KeyedObjectMaybe<'lesson', Lesson | null>[]>;
 export interface TimetableState {
-    [Week.Top]: Record<string, KeyedObjectMaybe<'lesson', Lesson>[]>;
-    [Week.Bottom]: Record<string, KeyedObjectMaybe<'lesson', Lesson>[]>;
+    [Week.Top]: TimetableWeek;
+    [Week.Bottom]: TimetableWeek;
 }
 
 export interface EditorState {
