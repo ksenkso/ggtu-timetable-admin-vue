@@ -5,6 +5,7 @@
     </slot>
     <slot name="input" :updateValue="updateValue" :disabled="disabled" :readonly="readonly" :value="value">
       <input
+          ref="input"
           class="form__control"
           @input="$emit('input', $event)"
           :type="type"
@@ -17,62 +18,47 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: 'Field',
-  props: {
-    name: {
-      type: String,
-      required: true,
-    },
-    label: {
-      type: String,
-      required: true,
-    },
-    type: {
-      type: String,
-      default: 'text',
-    },
-    disabled: {
-      type: Boolean,
-      default: false,
-    },
-    readonly: {
-      type: Boolean,
-      default: false,
-    },
-    inline: {
-      type: Boolean,
-      required: false,
-    },
-    initialValue: {
-      type: String,
-      required: false,
-      default: null,
-    },
-  },
-  data() {
-    return {
-      value: this.initialValue,
+<script lang="ts">
+import { Component, Vue } from 'vue-property-decorator';
+import { Prop } from 'vue-property-decorator';
+import { Ref } from 'vue-property-decorator';
+
+@Component({
+  name: 'Field'
+})
+export default class Field extends Vue {
+  @Prop({ required: true }) name!: string;
+  @Prop({ required: true }) label!: string;
+  @Prop() type?: string;
+  @Prop() disabled?: boolean;
+  @Prop() readonly?: boolean;
+  @Prop() inline?: boolean;
+  @Prop({ default: '' }) initialValue!: string;
+  @Ref('input') input?: HTMLInputElement;
+  value = '';
+
+  get id() {
+    return `${this.name}_${this.$vnode.tag}`;
+  }
+
+  get className() {
+    return `form__field${this.inline ? ' form__field_inline' : ''}`
+  }
+
+  focus() {
+    if (this.input) {
+      this.input.focus();
+    } else {
+      console.log(this.$slots.default);
     }
-  },
-  computed: {
-    id() {
-      return `${this.name}_${this.$vnode.tag}`;
-    },
-    className() {
-      return `form__field${this.inline ? ' form__field_inline' : ''}`
-    },
-  },
-  methods: {
-    updateValue(newValue) {
-      this.value = newValue;
-    },
-  },
+  }
+
+  updateValue(newValue: string | number) {
+    this.value = String(newValue);
+  }
+
   mounted() {
-    if (this.initialValue !== undefined) {
-      this.updateValue(this.value);
-    }
+    this.updateValue(this.initialValue);
   }
 }
 </script>
