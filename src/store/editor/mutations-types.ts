@@ -7,6 +7,8 @@ export const SET_LESSON = 'SET_LESSON';
 export const ADD_LESSON = 'ADD_LESSON';
 export const REMOVE_LESSON = 'REMOVE_LESSON';
 export const SET_LESSON_TO_UPDATE = 'SET_LESSON_TO_UPDATE';
+export const SET_WINDOW = 'SET_WINDOW';
+export const REMOVE_LESSON_BY_INDEX = 'REMOVE_LESSON_BY_INDEX';
 
 export const SET_PATCHES_FOR_WEEK = 'SET_PATCHES_FOR_WEEK';
 export const SET_PATCH = 'SET_PATCH';

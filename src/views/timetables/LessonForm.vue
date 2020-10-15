@@ -1,8 +1,11 @@
 <template>
-  <Card v-if="isReady">
+  <Card v-if="isReady" class="lesson-form">
     <template slot="header">
-      Пара {{lesson.index + 1}}
-      <Button theme="danger" @click.native="$emit('remove', index)">Убрать пару</Button>
+      Пара {{ lesson.index + 1 }}
+      <span class="lesson-form__buttons">
+        <Button theme="warning" @click.native="$emit('empty', lesson.index)">Окно</Button>
+        <Button theme="danger" @click.native="$emit('remove', lesson)">Убрать пару</Button>
+      </span>
     </template>
 
     <Form ref="form" @submit="saveLesson">
@@ -80,6 +83,10 @@ export default class LessonForm extends TimetableFormFragment<Lesson, CreateLess
     };
   }
 
+  makeWindow(index: number) {
+    console.log(index);
+  }
+
   protected createEntryDto(entry: Lesson): CreateLessonDto {
     return {
       cabinetId: entry.cabinetId || 0,
@@ -95,8 +102,16 @@ export default class LessonForm extends TimetableFormFragment<Lesson, CreateLess
 }
 </script>
 
-<style scoped lang="sass">
-.button_theme-danger
-  font-size: 1rem
-  float: right
+<style lang="sass">
+.lesson-form
+  .card__header
+    display: flex
+
+  &__buttons
+    margin-left: auto
+    display: flex
+    column-gap: 1rem
+    font-size: 1rem
+
+
 </style>

@@ -25,6 +25,9 @@ export default {
     getters: {
         currentDay(state) {
             return state.currentTimetable[state.week][state.day];
+        },
+        nextIndex(state): number {
+            return state.currentTimetable[state.week][state.day].length;
         }
     }
 } as Module<EditorState, RootState>

@@ -10,14 +10,15 @@
       <template v-else>
         <Alert v-if="!notEmptyDay" theme="warning">Нет занятий в этот день</Alert>
         <div class="fragments" v-if="notEmptyDay" ref="lessonsContainer">
-          <div class="lesson" v-for="entry in currentDay" :key="entry.id">
+          <div class="lesson" v-for="(entry, index) in currentDay" :key="entry.id">
             <component
-                v-if="entry.lesson"
                 :is="lessonView(entry.lesson)"
                 :lesson="entry.lesson"
+                :index="index"
                 @submit="saveLesson"
+                @remove="removeLesson"
+                @empty="makeWindow"
             ></component>
-            <MockLesson v-else :index="entry.lesson.index" @set="setLesson"></MockLesson>
           </div>
         </div>
       </template>
@@ -26,23 +27,26 @@
 </template>
 
 <script lang="ts">
-import {Component, Ref, Vue} from 'vue-property-decorator';
-import Page from "../Page.vue";
-import {Cabinet, CreateLessonDto, Lesson, LessonType, Subject, UpdateLessonDto, Week} from 'ggtu-timetable-api-client';
-import {NavigationGuardNext, Route} from 'vue-router';
+import { Component, Ref, Vue } from 'vue-property-decorator';
+import Page from '../Page.vue';
+import { CreateLessonDto, Lesson, UpdateLessonDto, Week } from 'ggtu-timetable-api-client';
+import { Day } from 'ggtu-timetable-api-client';
+import { NavigationGuardNext, Route } from 'vue-router';
 import RegularEntryForm from '@/views/timetables/LessonForm.vue';
-import {ButtonGroupValue} from '@/components/common/ButtonGroup.vue';
+import LessonForm from '@/views/timetables/LessonForm.vue';
+import { ButtonGroupValue } from '@/components/common/ButtonGroup.vue';
 import WeekPicker from '@/components/timetable/WeekPicker.vue';
 import DayPicker from '@/components/timetable/DayPicker.vue';
-import {namespace} from 'vuex-class';
+import { namespace } from 'vuex-class';
 import MockLesson from '@/components/timetable/MockLesson.vue';
-import {LessonHolder} from '@/utils/timetables';
-import {REMOVE_LESSON, SET_DAY, SET_GROUP_ID, SET_LESSON_TO_UPDATE, SET_WEEK} from "@/store/editor/mutations-types";
-import LessonView from "@/views/timetables/LessonView.vue";
-import {ADD_LESSON, GET_GROUP, GET_LESSONS_FOR_WEEK, UPDATE_LESSON} from "@/store/editor/action-types";
-import {EditorState, KeyedObjectMaybe} from "@/store/editor/types";
-import {v4} from "uuid";
-import LessonForm from "@/views/timetables/LessonForm.vue";
+import { LessonHolder } from '@/utils/timetables';
+import { REMOVE_LESSON, SET_DAY, SET_GROUP_ID, SET_LESSON_TO_UPDATE, SET_WEEK } from '@/store/editor/mutations-types';
+import { SET_WINDOW } from '@/store/editor/mutations-types';
+import LessonView from '@/views/timetables/LessonView.vue';
+import { ADD_LESSON, GET_GROUP, GET_LESSONS_FOR_WEEK, UPDATE_LESSON } from '@/store/editor/action-types';
+import { CREATE_EMPTY_LESSON } from '@/store/editor/action-types';
+import { EditorState, KeyedObjectMaybe } from '@/store/editor/types';
+import { KeyedObject } from '@/store/editor/types';
 
 Component.registerHooks([
   'beforeRouteEnter',
@@ -51,22 +55,23 @@ const editor = namespace('editor');
 
 @Component({
   name: 'Timetable',
-  components: {Page, RegularEntryForm, WeekPicker, DayPicker, MockLesson, LessonView, LessonForm}
+  components: { Page, RegularEntryForm, WeekPicker, DayPicker, MockLesson, LessonView, LessonForm }
 })
 export default class Timetable extends Vue {
 
   @editor.State(state => state) editor!: EditorState
   @editor.Action(GET_GROUP) getGroup!: (groupId: number) => Promise<void>;
   @editor.Action(GET_LESSONS_FOR_WEEK)
-  getLessonsForWeek!: ({groupId, week}: { groupId: number; week: Week }) => Promise<void>;
+  getLessonsForWeek!: ({ groupId, week }: { groupId: number; week: Week }) => Promise<void>;
   @editor.Action(UPDATE_LESSON) updateLesson!: (lesson: UpdateLessonDto) => Promise<void>;
   @editor.Action(ADD_LESSON) addLesson!: (lesson: CreateLessonDto) => Promise<void>;
   @editor.Mutation(SET_GROUP_ID) setGroupId!: (id: number) => void;
   @editor.Mutation(SET_WEEK) setWeek!: (id: number) => void;
   @editor.Mutation(SET_DAY) setDay!: (id: number) => void;
-  @editor.Mutation(SET_LESSON_TO_UPDATE) setLessonToUpdate!: (lesson: Lesson | null) => Promise<void>;
+  @editor.Mutation(SET_LESSON_TO_UPDATE) setLessonToUpdate!: (lesson: Lesson | null) => void;
+  @editor.Mutation(SET_WINDOW) setWindow!: ({ week, day, index }: { week: Week; day: Day; index: number }) => void;
   @editor.Mutation(REMOVE_LESSON) removeLesson!: (lesson: Lesson) => void;
-
+  @editor.Action(CREATE_EMPTY_LESSON) createLesson!: () => KeyedObject<'lesson', Lesson>;
   @Ref() forms!: LessonHolder[];
   @Ref() lessonsContainer!: HTMLDivElement;
 
@@ -79,35 +84,33 @@ export default class Timetable extends Vue {
   }
 
   get notEmptyDay() {
-    return this.currentDay && this.currentDay.some(entry => entry.lesson);
+    return this.currentDay && this.currentDay.length;//.some(entry => entry.lesson);
   }
 
-  lessonView(lesson: Lesson) {
-    return this.editor.lessonToUpdate && this.editor.lessonToUpdate.id === lesson.id ? 'LessonForm' : 'LessonView';
+  makeWindow(index: number) {
+    console.log(index);
+    this.setLessonToUpdate(null);
+    this.setWindow({ week: this.editor.week, day: this.editor.day, index });
   }
 
-  addLessonForm() {
-    const newEntry = {
-      id: v4(),
-      lesson: {
-        teachers: [],
-        subject: {} as Subject,
-        subjectId: 0,
-        cabinetId: 0,
-        groupId: this.editor.groupId,
-        cabinet: {} as Cabinet,
-        day: this.editor.day,
-        week: this.editor.week,
-        index: this.nextIndex(),
-        type: LessonType.Lecture,
-        id: 0,
-      }
-    };
+  lessonView(lesson: Lesson | null) {
+    return this.editor.lessonToUpdate && lesson && this.editor.lessonToUpdate.id === lesson.id ? 'LessonForm' : 'LessonView';
+  }
+
+  async addLessonForm() {
+    const newEntry = await this.createLesson();
     this.currentDay.push(newEntry);
     this.setLessonToUpdate(newEntry.lesson);
     this.$nextTick(() => {
-      (this.lessonsContainer.lastElementChild as HTMLElement).scrollIntoView({behavior: 'smooth'});
+      (this.lessonsContainer.lastElementChild as HTMLElement).scrollIntoView({ behavior: 'smooth' });
     })
+  }
+
+  tryRemoveLesson(lesson: Lesson) {
+    const shouldRemove = confirm(`Удалить пару ${lesson.index + 1}?`);
+    if (shouldRemove) {
+      this.removeLesson(lesson);
+    }
   }
 
   saveLesson(lesson: CreateLessonDto | UpdateLessonDto) {
@@ -116,7 +119,7 @@ export default class Timetable extends Vue {
       action = this.updateLesson(lesson);
     } else {
       action = this.addLesson(lesson as CreateLessonDto)
-        .then(() => this.removeLesson(lesson as Lesson));
+          .then(() => this.removeLesson(lesson as Lesson));
     }
     action.then(() => {
       this.setLessonToUpdate(null);
@@ -132,20 +135,10 @@ export default class Timetable extends Vue {
     this.loadEntries(this.editor.groupId);
   }
 
-  nextIndex() {
-    let max = -1;
-    for (const entry of this.currentDay) {
-      if (entry.lesson && entry.lesson.index > max) {
-        max = entry.lesson.index;
-      }
-    }
-    return max + 1;
-  }
-
   loadEntries(groupId: number): Promise<void> {
     this.isLoading = true;
     return this.getGroup(groupId)
-        .then(() => this.getLessonsForWeek({groupId, week: this.editor.week}))
+        .then(() => this.getLessonsForWeek({ groupId, week: this.editor.week }))
         .then(() => {
           this.isLoading = false;
         });
