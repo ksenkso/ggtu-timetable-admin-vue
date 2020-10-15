@@ -1,7 +1,7 @@
 <template>
   <Page title="Предметы">
     <EntityControls
-        create-route="/lessons/create"
+        create-route="/subjects/create"
         :set-filter-value="setFilterValue">
     </EntityControls>
     <Alert v-if="isEmpty && dataLoader.loaded" theme="warning">Записи не найдены</Alert>
@@ -9,7 +9,7 @@
     <EntityList
         v-show="!isEmpty"
         :entities="filteredEntities"
-        editRoute="/lessons"
+        editRoute="/subjects"
         :deleteCallback="deleteCallback">
     </EntityList>
   </Page>
