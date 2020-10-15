@@ -1,11 +1,11 @@
 import Vue from 'vue'
-import VueRouter, {RouteConfig} from 'vue-router'
-import {api} from "@/api";
-import subjects from "./subjects";
-import teachers from "@/router/teachers";
-import groups from "@/router/groups";
-import cabinets from "@/router/cabinets";
-import buildings from "@/router/buildings";
+import VueRouter, { RouteConfig } from 'vue-router'
+import { api } from '@/api';
+import subjects from './subjects';
+import teachers from '@/router/teachers';
+import groups from '@/router/groups';
+import cabinets from '@/router/cabinets';
+import buildings from '@/router/buildings';
 import timetable from '@/router/timetable';
 import patches from '@/router/patches';
 
@@ -42,7 +42,7 @@ router.beforeEach((to, from, next) => {
         if (api.auth.user) {
             next();
         } else {
-            next({name: 'Login'});
+            next({ name: 'Login' });
         }
     } else if (to.name === 'Login') {
         if (api.auth.user) {
@@ -53,6 +53,10 @@ router.beforeEach((to, from, next) => {
     } else {
         next();
     }
+});
+
+api.auth.on('logout', () => {
+    router.push({ name: 'Login' });
 })
 
 export default router
