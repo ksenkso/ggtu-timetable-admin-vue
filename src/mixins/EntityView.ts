@@ -33,9 +33,9 @@ export default function entityView<T extends NamedEntity>(context: BindingHelper
         onSubmit(data: T) {
             let request;
             if (this.model?.id) {
-                request = this.update({...data, id: this.model.id});
+                request = this.update({ ...data, id: this.model.id });
             } else {
-                request = this.create({...data});
+                request = this.create({ ...data });
             }
 
             request.then(() => {
@@ -43,19 +43,24 @@ export default function entityView<T extends NamedEntity>(context: BindingHelper
             })
         }
 
+        getDefaultModel(): T {
+            return { name: '' } as T;
+        }
+
         beforeRouteEnter(to: Route, from: Route, next: NavigationGuardNext) {
             next((vm: Vue) => {
+                const instance = vm as EntityView;
                 if (to.params.id) {
-                    (vm as EntityView).isLoading = true;
-                    (vm as EntityView).getEntity(+to.params.id)
+                    instance.isLoading = true;
+                    instance.getEntity(+to.params.id)
                         .then((model) => {
-                            (vm as any).model = model;
-                            (vm as EntityView).isLoading = false;
-                            (vm as EntityView).loaded = true;
+                            instance.model = model;
+                            instance.isLoading = false;
+                            instance.loaded = true;
                             next();
                         });
                 } else {
-                    (vm as any).model = {name: ''};
+                    instance.model = instance.getDefaultModel();
                 }
             })
         }
