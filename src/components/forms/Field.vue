@@ -33,9 +33,14 @@ export default class Field extends Vue {
   @Prop() disabled?: boolean;
   @Prop() readonly?: boolean;
   @Prop() inline?: boolean;
-  @Prop({ default: '' }) initialValue!: string;
+  @Prop() initialValue?: string;
   @Ref('input') input?: HTMLInputElement;
-  value = '';
+
+  data() {
+    return {
+      value: undefined
+    }
+  }
 
   get id() {
     return `${this.name}_${this.$vnode.tag}`;
@@ -48,17 +53,17 @@ export default class Field extends Vue {
   focus() {
     if (this.input) {
       this.input.focus();
-    } else {
-      console.log(this.$slots.default);
     }
   }
 
   updateValue(newValue: string | number) {
-    this.value = String(newValue);
+    (this as any).value = newValue;
   }
 
   mounted() {
-    this.updateValue(this.initialValue);
+    if (this.initialValue !== undefined) {
+      this.updateValue(this.initialValue);
+    }
   }
 }
 </script>
