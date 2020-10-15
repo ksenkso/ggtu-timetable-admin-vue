@@ -44,7 +44,6 @@ export default class CreatePatch extends Vue {
   }
 
   saveLesson(data: CreatePatchDto) {
-    console.log(data);
     this.createPatch(data)
         .then(() => {
           this.$router.push({name: 'PatchesView', params: {groupId: this.groupId.toString()}})
