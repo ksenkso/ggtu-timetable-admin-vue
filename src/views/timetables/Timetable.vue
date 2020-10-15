@@ -102,7 +102,29 @@ export default class Timetable extends Vue {
     this.currentDay.push(newEntry);
     this.setLessonToUpdate(newEntry.lesson);
     this.$nextTick(() => {
-      (this.lessonsContainer.lastElementChild as HTMLElement).scrollIntoView({ behavior: 'smooth' });
+      const card = (this.lessonsContainer.lastElementChild as HTMLElement);
+      const page = document.querySelector('.page__content');
+      // listen for scroll event on page content to determine if smooth scrolling has ended
+      // if there were no scroll events in 100ms, then consider that scrolling has ended
+      let timeout: number, called = false;
+      const checkScroll = () => {
+        clearTimeout(timeout);
+        called = true;
+        timeout = setTimeout(() => {
+          (page as HTMLDivElement).removeEventListener('scroll', checkScroll);
+          const input = card.querySelector('input') as HTMLInputElement;
+          input.focus();
+
+        }, 100);
+      }
+      (page as HTMLDivElement).addEventListener('scroll', checkScroll);
+      card.scrollIntoView({ behavior: 'smooth' });
+      setTimeout(() => {
+        if (!called) {
+          const input = card.querySelector('input') as HTMLInputElement;
+          input.focus();
+        }
+      }, 100);
     })
   }
 
@@ -144,14 +166,22 @@ export default class Timetable extends Vue {
         });
   }
 
+  mounted() {
+    console.log(this.editor.day, this.editor.week, this.currentDay);
+  }
+
   beforeRouteEnter(to: Route, from: Route, next: NavigationGuardNext) {
     if (!to.params.groupId) {
       next('/groups');
     } else {
       next((vm: Vue) => {
         const instance = vm as Timetable;
-        instance.setWeek(0);
-        instance.setDay(0);
+        if (!instance.editor.week) {
+          instance.setWeek(0);
+        }
+        if (!instance.editor.day) {
+          instance.setDay(0);
+        }
         instance.loadEntries(+to.params.groupId);
       })
     }
