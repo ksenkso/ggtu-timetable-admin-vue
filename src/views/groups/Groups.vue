@@ -2,7 +2,7 @@
   <Page title="Группы">
     <EntityControls
         create-route="/groups/create"
-        :filter-callback="filterCallback">
+        :set-filter-value="setFilterValue">
     </EntityControls>
     <Alert v-if="isEmpty && dataLoader.loaded" theme="warning">Записи не найдены</Alert>
     <Alert theme="info" v-if="dataLoader.isLoading">Загрузка...</Alert>
