@@ -8,21 +8,23 @@ export interface ModuleOverrides {
     actions?: ActionTree<EntitiesState, RootState>;
     getters?: GetterTree<EntitiesState, RootState>;
 }
+
 const createEntitiesModule = (type: EntityType, overrides: ModuleOverrides = {}): Module<EntitiesState, RootState> => ({
     namespaced: true,
     state: () => ({
         entities: {},
         ids: [],
-        filter: '',
+        filterValue: '',
         isLoaded: false,
+        filter: () => false
     }),
     mutations: createMutations(),
     actions: createActions(type, overrides.actions),
     getters: {
         filteredEntities(state): NamedEntityDict {
-            return state.filter
+            return state.filterValue
                 ? state.ids
-                    .filter(id => state.entities[id].name.toLowerCase().includes(state.filter))
+                    .filter(state.filter)
                     .reduce<NamedEntityDict>((acc, id) => {
                         acc[id] = state.entities[id];
                         return acc;

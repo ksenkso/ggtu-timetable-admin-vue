@@ -1,9 +1,17 @@
-import {EntitiesState, NamedEntity, NamedEntityDict} from "@/store/entities/types";
-import {MutationTree} from "vuex";
-import {WithId} from 'ggtu-timetable-api-client/dist/interfaces';
-import {ADD_ENTITY, REMOVE_ENTITY, SET_ALL_ENTITIES, SET_ENTITY, SET_FILTER} from "@/store/entities/mutations-types";
-import Vue from "vue";
+import { EntitiesState, NamedEntity, NamedEntityDict } from '@/store/entities/types';
+import { EntityListFilter } from '@/store/entities/types';
+import { MutationTree } from 'vuex';
+import { WithId } from 'ggtu-timetable-api-client/dist/interfaces';
+import {
+    ADD_ENTITY,
+    REMOVE_ENTITY,
+    SET_ALL_ENTITIES,
+    SET_ENTITY,
+    SET_FILTER_VALUE
+} from '@/store/entities/mutations-types';
 import { SET_LOADED } from '@/store/entities/mutations-types';
+import Vue from 'vue';
+import { SET_FILTER } from '@/store/entities/mutations-types';
 
 const createMutations = (): MutationTree<EntitiesState> => {
     return {
@@ -25,11 +33,14 @@ const createMutations = (): MutationTree<EntitiesState> => {
             }, {});
             state.ids = entities.map(entity => entity.id);
         },
-        [SET_FILTER](state, filter) {
-            state.filter = filter;
+        [SET_FILTER_VALUE](state, filter) {
+            state.filterValue = filter;
         },
         [SET_LOADED](state, isLoaded) {
             state.isLoaded = isLoaded;
+        },
+        [SET_FILTER](state, filterFactory: (state: EntitiesState) => EntityListFilter) {
+            state.filter = filterFactory(state);
         }
     }
 }

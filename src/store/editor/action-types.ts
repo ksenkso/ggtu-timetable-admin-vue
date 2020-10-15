@@ -9,5 +9,6 @@ export const ADD_PATCH = 'ADD_PATCH';
 export const REMOVE_PATCH = 'REMOVE_PATCH';
 export const UPDATE_PATCH = 'UPDATE_PATCH';
 export const LOAD_PATCH = 'LOAD_PATCH';
+export const CREATE_EMPTY_LESSON = 'CREATE_EMPTY_LESSON';
 
 export const GET_GROUP = 'GET_GROUP';

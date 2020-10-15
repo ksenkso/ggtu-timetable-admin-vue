@@ -6,12 +6,13 @@ export interface NamedEntity {
 }
 
 export type NamedEntityDict = Record<number | string, WithId<NamedEntity>>;
-
+export type EntityListFilter = (id: number, index?: number, ids?: number[]) => boolean;
 export interface EntitiesState {
     ids: number[];
     entities: NamedEntityDict;
-    filter: string;
+    filterValue: string;
     isLoaded: boolean;
+    filter: EntityListFilter;
 }
 
 export interface EmptyLesson {

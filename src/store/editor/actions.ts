@@ -29,6 +29,13 @@ import {
     UpdatePatchDto,
     Week
 } from 'ggtu-timetable-api-client';
+import { REMOVE_LESSON_BY_INDEX } from '@/store/editor/mutations-types';
+import { CREATE_EMPTY_LESSON } from '@/store/editor/action-types';
+import { v4 } from 'uuid';
+import { Subject } from 'ggtu-timetable-api-client';
+import { Cabinet } from 'ggtu-timetable-api-client';
+import { LessonType } from 'ggtu-timetable-api-client';
+import { KeyedObject } from '@/store/editor/types';
 
 export default {
     [GET_GROUP](context, groupId: number) {
@@ -53,7 +60,8 @@ export default {
     [REMOVE_LESSON](context, lesson: Lesson) {
         return api.timetable.delete(lesson.id)
             .then(() => {
-                context.commit(REMOVE_LESSON, lesson);
+                const index = context.commit(REMOVE_LESSON, lesson);
+                context.commit(REMOVE_LESSON_BY_INDEX, index);
             });
     },
     [UPDATE_LESSON](context, lesson: UpdateLessonDto) {
@@ -97,5 +105,23 @@ export default {
             .then(lesson => {
                 context.commit(SET_LESSON_TO_UPDATE, lesson)
             })
+    },
+    [CREATE_EMPTY_LESSON](context, lesson: Partial<Lesson> = {}): Promise<KeyedObject<'lesson', Lesson>> {
+        return Promise.resolve({
+            id: v4(),
+            lesson: Object.assign({
+                teachers: [],
+                subject: {} as Subject,
+                subjectId: 0,
+                cabinetId: 0,
+                groupId: context.state.groupId,
+                cabinet: {} as Cabinet,
+                day: context.state.day,
+                week: context.state.week,
+                index: context.getters.nextIndex,
+                type: LessonType.Lecture,
+                id: 0,
+            }, lesson) as unknown as Lesson
+        });
     }
 } as ActionTree<EditorState, RootState>
