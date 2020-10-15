@@ -27,7 +27,7 @@ const subjects = namespace('subjects');
 export default class SubjectView extends entityView(subjects) {
   redirectRoute = '/subjects';
   get title(): string {
-    return this.$route.params.id ? 'Редактирование группы' : 'Добавление группы';
+    return this.$route.params.id ? 'Редактирование предмета' : 'Добавление предмета';
   }
 
   getEntity = (id: number): Promise<WithId<Subject>> => {
