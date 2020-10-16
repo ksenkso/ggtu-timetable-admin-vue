@@ -1,24 +1,30 @@
 import createMutations from './mutations';
 import createActions from './actions';
-import {Module} from "vuex";
+import {ActionTree, GetterTree, Module} from "vuex";
 import {EntitiesState, NamedEntityDict} from "@/store/entities/types";
 import {RootState} from "@/store/types";
 import {EntityType} from "ggtu-timetable-api-client";
+export interface ModuleOverrides {
+    actions?: ActionTree<EntitiesState, RootState>;
+    getters?: GetterTree<EntitiesState, RootState>;
+}
 
-const createEntitiesModule = (type: EntityType): Module<EntitiesState, RootState> => ({
+const createEntitiesModule = (type: EntityType, overrides: ModuleOverrides = {}): Module<EntitiesState, RootState> => ({
     namespaced: true,
     state: () => ({
         entities: {},
         ids: [],
-        filter: '',
+        filterValue: '',
+        isLoaded: false,
+        filter: () => false
     }),
     mutations: createMutations(),
-    actions: createActions(type),
+    actions: createActions(type, overrides.actions),
     getters: {
         filteredEntities(state): NamedEntityDict {
-            return state.filter
+            return state.filterValue
                 ? state.ids
-                    .filter(id => state.entities[id].name.toLowerCase().includes(state.filter))
+                    .filter(state.filter)
                     .reduce<NamedEntityDict>((acc, id) => {
                         acc[id] = state.entities[id];
                         return acc;
@@ -27,7 +33,8 @@ const createEntitiesModule = (type: EntityType): Module<EntitiesState, RootState
         },
         isEmpty(state, getters): boolean {
             return !Object.keys(getters.filteredEntities).length;
-        }
+        },
+        ...overrides.getters,
     }
 });
 

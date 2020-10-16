@@ -2,11 +2,13 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import createEntitiesModule from "@/store/entities";
 import {EntityType} from "ggtu-timetable-api-client";
+import editor from './editor';
 
 Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
+
   },
   mutations: {
   },
@@ -18,6 +20,7 @@ export default new Vuex.Store({
     teachers: createEntitiesModule(EntityType.Teacher),
     buildings: createEntitiesModule(EntityType.Building),
     cabinets: createEntitiesModule(EntityType.Cabinet),
-    lessons: createEntitiesModule(EntityType.Lesson),
+    subjects: createEntitiesModule(EntityType.Subject),
+    editor
   }
 })

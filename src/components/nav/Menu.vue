@@ -15,7 +15,7 @@
 </template>
 
 <script lang="ts">
-import {Component, Prop, Vue} from "vue-property-decorator";
+import {Component, Vue} from "vue-property-decorator";
 
 export type MenuItem = {
   link: string;
@@ -26,8 +26,13 @@ export type MenuItem = {
   name: 'Menu'
 })
 export default class Menu extends Vue {
-  @Prop({required: true, default: () => []})
-  items!: MenuItem[];
+  items: MenuItem[] = [
+    {link: '/groups', text: 'Группы'},
+    {link: '/teachers', text: 'Учителя'},
+    {link: '/subjects', text: 'Предметы'},
+    {link: '/buildings', text: 'Здания'},
+    {link: '/cabinets', text: 'Кабинеты'},
+  ];
 }
 </script>
 

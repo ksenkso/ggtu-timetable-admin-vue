@@ -1,13 +1,13 @@
 <template>
   <aside class="sidebar">
     <UserInfo></UserInfo>
-    <Menu :items="menuItems"></Menu>
+    <Menu></Menu>
   </aside>
 </template>
 
 <script lang="ts">
 import {Component, Vue} from "vue-property-decorator";
-import Menu, {MenuItem} from "./Menu.vue";
+import Menu from "./Menu.vue";
 import UserInfo from "./UserInfo.vue";
 
 @Component({
@@ -15,11 +15,7 @@ import UserInfo from "./UserInfo.vue";
   components: {Menu, UserInfo}
 })
 export default class NavBar extends Vue {
-  menuItems: MenuItem[] = [
-    {link: '/groups', text: 'Группы'},
-    {link: '/teachers', text: 'Учителя'},
-    {link: '/lessons', text: 'Предметы'},
-  ];
+
 }
 </script>
 

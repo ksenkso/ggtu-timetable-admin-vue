@@ -1,6 +1,6 @@
 <template>
   <div class="entity-controls">
-    <EntityFilter :filter-callback="filterCallback"></EntityFilter>
+    <EntityFilter :set-filter-value="setFilterValue"></EntityFilter>
     <router-link :to="createRoute" class="button button_theme-primary">Добавить</router-link>
   </div>
 </template>
@@ -16,7 +16,7 @@ import EntityFilter from "@/components/entities/EntityFilter.vue";
 })
 export default class EntityControls extends Vue {
   @Prop({required: true})
-  filterCallback!: (filter: string) => void
+  setFilterValue!: (filter: string) => void
 
   @Prop({required: true})
   createRoute!: string;

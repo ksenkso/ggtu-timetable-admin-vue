@@ -1,7 +1,9 @@
 <template>
   <ul class="entity-list">
     <li v-for="entity in entities" :key="entity.id" class="entity-list__item">
-      <router-link class="entity-list__link" :to="`${editRoute}/${entity.id}`">{{ entity.name }}</router-link>
+      <slot name="item" :entity="entity">
+        <router-link class="entity-list__link" :to="`${editRoute}/${entity.id}`">{{ entity.name }}</router-link>
+      </slot>
       <Button class="entity-list__delete" theme="danger" @click.native="deleteEntity(entity)">Удалить</Button>
     </li>
   </ul>
@@ -46,18 +48,21 @@ export default class EntityList extends Vue {
   margin: 0
   border: 1px solid #ddd
   border-radius: 3px
+
   &__item
     border-bottom: 1px solid #ddd
     padding: 8px 12px
     display: flex
     align-items: baseline
     align-content: baseline
+    .button + .button
+      margin-left: .5rem
     &:hover
       background-color: #eee
-    .button
-      margin-left: auto
+
     &:last-child
       border-bottom: none
+
   &__link
     text-decoration: none
     cursor: pointer
